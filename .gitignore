@@ -4,4 +4,5 @@
 build/*
 zip/*
 .p4ignore
-tools/builddev.bat
+tools/*.bat
+.externalToolBuilders
