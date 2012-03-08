@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="kineticjs" default="build" basedir=".">
+
+	<!--
+		PROPERTIES				
+	-->
+	<tstamp>
+        <format property="datenow" pattern="MMMM dd, yyyy" locale="en"/>
+	</tstamp>
+	
+	<property environment="env"/>
+	<property name="libname" value="kinetic"/>
+	<property name="libversion" value="v3.8.2"/>
+	<property name="kineticjs-version" value="v3.8.2"/>
+	<property name="tools.root" value="."/>
+	
+	<property name="yuicompress.version" value="2.4.7"/>
+	<property name="yuicompress.jar" value="${tools.root}/yuicompressor-${yuicompress.version}/build/yuicompressor-${yuicompress.version}.jar"/>
+	  
+	<property name="dir.src" value="../src"/>
+	<property name="dir.dest" value="../build"/>
+
+	<property name="out.jsfile" value="${dir.dest}/${libname}-${libversion}.js"/>
+	<property name="out.jsfile.min" value="${dir.dest}/${libname}-${libversion}.min.js"/>
+	
+	<filelist id="in.jslist" dir="${dir.src}">
+		<!-- Base files -->
+		<file name='../license.js'/>
+		<file name='${dir.src}/GlobalObject.js'/>
+		<file name='${dir.src}/Node.js'/>
+		<file name='${dir.src}/Container.js'/>
+		<file name='${dir.src}/Stage.js'/>
+		<file name='${dir.src}/Layer.js'/>
+		<file name='${dir.src}/Group.js'/>
+		<file name='${dir.src}/geometries/Shape.js'/>
+		<file name='${dir.src}/geometries/Rect.js'/>
+		<file name='${dir.src}/geometries/Circle.js'/>
+		<file name='${dir.src}/geometries/Image.js'/>
+		<file name='${dir.src}/geometries/Polygon.js'/>
+		<file name='${dir.src}/geometries/RegularPolygon.js'/>
+		<file name='${dir.src}/geometries/Star.js'/>
+		<file name='${dir.src}/geometries/Text.js'/>
+	</filelist>
+	    
+
+	<property name="dest.pathzip" value="../zip"/>
+	<property name="dest.zipbin" value="${dest.pathzip}/${libname}-${libversion}-bin.zip"/>
+	<property name="dest.zipsrc" value="${dest.pathzip}/${libname}-${libversion}-src.zip"/>
+	<property name="zip.pathbase" value=".."/>
+	
+	<!--
+		PUBLIC TARGETS				
+	-->
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+		    <fileset dir="${dir.dest}">
+				<exclude name="**/*.jsp"/>
+			</fileset>
+		</delete>
+	</target>
+	  
+	<target name="buildcode">
+    	<mkdir dir="${dir.dest}"/>
+		<delete includeEmptyDirs="true">
+		    <fileset dir="${dir.dest}"/>
+		</delete>
+		<!-- Build combined source file -->
+	  	<concat destfile="${out.jsfile}" fixlastline="yes">
+	  		<filelist refid="in.jslist"/>
+	  	</concat>
+		<!-- Replace information tokens -->
+	  	<replace file="${out.jsfile}" token="@@kineticjs-version@@" value="${kineticjs-version}"/>
+	  	<replace file="${out.jsfile}" token="@@version@@" value="${libversion}"/>
+	  	<replace file="${out.jsfile}" token="@@date@@" value="${datenow}"/>
+		<!-- Minify -->
+	    <java fork="true" jar="${yuicompress.jar}">
+			<arg value="-v" />
+			<arg value="--line-break"/><arg value="78"/>
+			<arg value="-o"/><arg value="${out.jsfile.min}"/>
+			<arg value="${out.jsfile}" />
+	    </java>  
+	</target>
+
+	<target name="buildzipbin" depends="buildcode">
+    	<mkdir dir="${dest.pathzip}"/>
+		<zip destfile="${dest.zipbin}" basedir="${zip.pathbase}" includes="build/**,LICENSE,README.md"/>
+	</target>
+
+	<target name="buildzipsrc" depends="buildcode">
+    	<mkdir dir="${dest.pathzip}"/>
+		<zip destfile="${dest.zipsrc}" basedir="${zip.pathbase}" excludes="**/zip/**,build/**,.*/**"/>
+	</target>
+
+	<target name="build" depends="buildzipbin, buildzipsrc"/>
+</project>
