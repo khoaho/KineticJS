@@ -90,7 +90,7 @@
 
 	<target name="buildzipsrc" depends="buildcode">
     	<mkdir dir="${dest.pathzip}"/>
-		<zip destfile="${dest.zipsrc}" basedir="${zip.pathbase}" excludes="**/zip/**,build/**,.*/**"/>
+		<zip destfile="${dest.zipsrc}" basedir="${zip.pathbase}" excludes="**/zip/**,build/**,.*/**,tools/*.bat"/>
 	</target>
 
 	<target name="build" depends="buildzipbin, buildzipsrc"/>
