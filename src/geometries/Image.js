@@ -17,7 +17,6 @@ Kinetic.Image = function(config) {
     }
 
     config.drawFunc = function() {
-        var canvas = this.getCanvas();
         var context = this.getContext();
         context.beginPath();
         context.rect(0, 0, this.width, this.height);
@@ -34,7 +33,7 @@ Kinetic.Image = function(config) {
 Kinetic.Image.prototype = {
     /**
      * set image
-     * @param {ImageObject} image
+     * @param {Image} image
      */
     setImage: function(image) {
         this.image = image;
@@ -42,7 +41,7 @@ Kinetic.Image.prototype = {
     /**
      * get image
      */
-    getImage: function(image) {
+    getImage: function() {
         return this.image;
     },
     /**

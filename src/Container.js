@@ -37,7 +37,7 @@ Kinetic.Container.prototype = {
     },
     /**
      * remove child from container
-     * @param {Node} child
+     * @param {Kinetic.Node} child
      */
     _remove: function(child) {
         if(child.name !== undefined) {
@@ -45,7 +45,6 @@ Kinetic.Container.prototype = {
         }
         this.children.splice(child.index, 1);
         this._setChildrenIndices();
-        child = undefined;
     },
     /**
      * draw children
@@ -63,7 +62,7 @@ Kinetic.Container.prototype = {
     },
     /**
      * add node to container
-     * @param {Node} child
+     * @param {Kinetic.Node} child
      */
     _add: function(child) {
         if(child.name) {

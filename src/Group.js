@@ -22,14 +22,14 @@ Kinetic.Group = function(config) {
 Kinetic.Group.prototype = {
     /**
      * add node to group
-     * @param {Node} child
+     * @param {Kinetic.Node} child
      */
     add: function(child) {
         this._add(child);
     },
     /**
      * remove a child node from the group
-     * @param {Node} child
+     * @param {Kinetic.Node} child
      */
     remove: function(child) {
         this._remove(child);

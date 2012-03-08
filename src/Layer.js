@@ -51,14 +51,14 @@ Kinetic.Layer.prototype = {
     },
     /**
      * add node to layer
-     * @param {Node} node
+     * @param {Kinetic.Node} child
      */
     add: function(child) {
         this._add(child);
     },
     /**
      * remove a child from the layer
-     * @param {Node} child
+     * @param {Kinetic.Node} child
      */
     remove: function(child) {
         this._remove(child);

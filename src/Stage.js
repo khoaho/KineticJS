@@ -5,7 +5,7 @@
  * Stage constructor.  A stage is used to contain multiple layers and handle
  * animations
  * @constructor
- * @param {String|DomElement} cont Container id or DOM element
+ * @param {String|Node} cont Container id or DOM element
  * @param {int} width
  * @param {int} height
  */
@@ -215,7 +215,7 @@ Kinetic.Stage.prototype = {
     },
     /**
      * remove layer from stage
-     * @param {Layer} layer
+     * @param {Kinetic.Layer} layer
      */
     remove: function(layer) {
         // remove layer canvas from dom
@@ -238,7 +238,7 @@ Kinetic.Stage.prototype = {
     },
     /**
      * add layer to stage
-     * @param {Layer} layer
+     * @param {Kinetic.Layer} layer
      */
     add: function(layer) {
         if(layer.name) {
@@ -553,7 +553,7 @@ Kinetic.Stage.prototype = {
     },
     /**
      * disable layer rendering
-     * @param {Layer} layer
+     * @param {Kinetic.Layer} layer
      */
     _stripLayer: function(layer) {
         layer.context.stroke = function() {

@@ -33,6 +33,8 @@ Kinetic.Node = function(config) {
     // set properties from config
     if(config) {
         for(var key in config) {
+            if( !config.hasOwnProperty(key) )
+                continue;
             // handle special keys
             switch (key) {
                 case "draggable":
@@ -307,7 +309,7 @@ Kinetic.Node.prototype = {
     },
     /**
      * set zIndex
-     * @param {int} index
+     * @param {int} zIndex
      */
     setZIndex: function(zIndex) {
         var index = this.index;
@@ -405,7 +407,7 @@ Kinetic.Node.prototype = {
     },
     /**
      * move node to another container
-     * @param {Layer} newLayer
+     * @param {Kinetic.Container} newContainer
      */
     moveTo: function(newContainer) {
         var parent = this.parent;
