@@ -1,18 +1,30 @@
-# What's KineticJS
+# KineticJs Extended (kinetic-ext) Javascript Library
+KineticJs Extended "extends" KineticJs, an HTML5 Canvas JavaScript library. Additional features:
 
-[http://www.kineticjs.com](KineticJS)
+- Adds a matrix transform class
+- Ability to get a shape's transform matrix (Kinetic.Shape.getTransform())
 
-Greetings fellow webonauts! KineticJS is an HTML5 Canvas JavaScript library that extends the 2d context by enabling canvas interactivity for desktop and mobile applications.
 
-You can draw your own shapes or images using the existing canvas API, add event listeners to them, move them, scale them, and rotate them independently from other shapes to support high performance animations, even if your application uses thousands of shapes.  Served hot with a side of awesomeness.
+## Attribution
+The library also includes substantial portions of Simon Sarris's Transform Javascript class 
 
-# Tutorials
-Check out the official [KineticJS Tutorials](http://www.html5canvastutorials.com/kineticjs/html5-canvas-events-tutorials-introduction-with-kineticjs/) hosted on [HTML5 Canvas Tutorials](http://www.html5canvastutorials.com/).
+## Licensing
+This project is licensed under the MIT license and/or GPL v2 license.
 
-# Building the library
-To build the library, you need to have Ruby and Rubygems installed. After that, install the dependencies by running `bundle install`.
+## Contributors
+- Eric Rowell for the original KineticJS library (http://www.kineticjs.com/)
+- Simon Sarris for a substantial part of the Kinetic.Transform source code (www.simonsarris.com)
+- Chris Khoo ([Wappworks Studio](http://www.wappworks.com))
 
-To build a development version of the library, run `thor build:dev VERSION`, where VERSION is in the format MAJOR.MINOR.PATCH. To build a minify version of the library, run `thor build:prod VERSION`. If you want to add a release date other than the current day, use `-d="DATE"` (e.g. `-d="Mar 07 2012`).
+## Build environment
+### Requirements
+- Apache Ant (http://ant.apache.org/)
 
-# Adding a new file in the src directory
-If you add a file in the src directory, add into the array in the Thorfile.
+### Notes
+- The build environment is found under the 'tools' subdirectory. 
+- The build pipeline relies on YUI3 compressor (http://yuilibrary.com/projects/yuicompressor/). 
+  A version of YUI3 compressor has been integrated into the source package to create an standalone 
+  build environment package. 
+- By default, the Ant build script 'build/antbuild.xml' builds all the library packages.
+  - To build just the source files, use the 'buildcode' target instead.
+

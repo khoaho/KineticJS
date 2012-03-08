@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="kineticjs" default="build" basedir=".">
+<project name="kinetic-ext" default="build" basedir=".">
 
 	<!--
 		PROPERTIES				
@@ -9,8 +9,8 @@
 	</tstamp>
 	
 	<property environment="env"/>
-	<property name="libname" value="kinetic"/>
-	<property name="libversion" value="v3.8.2"/>
+	<property name="libname" value="kinetic-ext"/>
+	<property name="libversion" value="v3.8.2.1"/>
 	<property name="kineticjs-version" value="v3.8.2"/>
 	<property name="tools.root" value="."/>
 	
@@ -25,13 +25,15 @@
 	
 	<filelist id="in.jslist" dir="${dir.src}">
 		<!-- Base files -->
-		<file name='../license.js'/>
+		<file name='${dir.src}/license/ext-license.js'/>
+		<file name='${dir.src}/license/kineticjs-license.js'/>
 		<file name='${dir.src}/GlobalObject.js'/>
 		<file name='${dir.src}/Node.js'/>
 		<file name='${dir.src}/Container.js'/>
 		<file name='${dir.src}/Stage.js'/>
 		<file name='${dir.src}/Layer.js'/>
 		<file name='${dir.src}/Group.js'/>
+		<file name='${dir.src}/Transform.js'/>
 		<file name='${dir.src}/geometries/Shape.js'/>
 		<file name='${dir.src}/geometries/Rect.js'/>
 		<file name='${dir.src}/geometries/Circle.js'/>

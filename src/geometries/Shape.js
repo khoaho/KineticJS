@@ -100,8 +100,47 @@ Kinetic.Shape.prototype = {
         return this.strokeWidth;
     },
     /**
+     * get the transform
+     * @returns {Kinetic.Transform}
+     */
+    getTransform: function()
+    {
+        var transform = new Kinetic.Transform();
+
+        var family = [];
+        family.unshift(this);
+        var parent = this.parent;
+        while (parent.className !== "Stage") {
+            family.unshift(parent);
+            parent = parent.parent;
+        }
+
+        // children transforms
+        for (var n = 0; n < family.length; n++) {
+            var obj = family[n];
+
+            if (obj.x !== 0 || obj.y !== 0) {
+                transform.translate(obj.x, obj.y);
+            }
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
+            }
+            if (obj.rotation !== 0) {
+                transform.rotate(obj.rotation);
+            }
+            if (obj.scale.x !== 1 || obj.scale.y !== 1) {
+                transform.scale(obj.scale.x, obj.scale.y);
+            }
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
+            }
+        }
+
+        return( transform );
+    },
+    /**
      * draw shape
-     * @param {Layer} layer Layer that the shape will be drawn on
+     * @param {Kinetic.Layer} layer Layer that the shape will be drawn on
      */
     _draw: function(layer) {
         if(this.visible) {
