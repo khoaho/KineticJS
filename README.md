@@ -12,7 +12,7 @@ The library also includes substantial portions of Simon Sarris's Transform Javas
 This project is licensed under the MIT license and/or GPL v2 license.
 
 ## Contributors
-- Eric Rowell for the original KineticJS library (http://www.kineticjs.com/)
+- Eric Rowell and Antoine Proulx for the original KineticJS GitHub source (http://www.kineticjs.com/)
 - Simon Sarris for a substantial part of the Kinetic.Transform source code (www.simonsarris.com)
 - Chris Khoo ([Wappworks Studio](http://www.wappworks.com))
 
