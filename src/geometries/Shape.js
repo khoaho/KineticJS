@@ -141,8 +141,9 @@ Kinetic.Shape.prototype = {
     /**
      * draw shape
      * @param {Kinetic.Layer} layer Layer that the shape will be drawn on
+     * @param {Boolean} isDetectMode True if drawing in detect mode...
      */
-    _draw: function(layer) {
+    _draw: function(layer, isDetectMode) {
         if(this.visible) {
             var stage = layer.getStage();
             var context = layer.getContext();
@@ -188,7 +189,7 @@ Kinetic.Shape.prototype = {
             }
 
             this.tempLayer = layer;
-            this.drawFunc.call(this);
+            this.drawFunc.call(this, isDetectMode);
 
             // children restore
             for(var i = 0; i < family.length; i++) {

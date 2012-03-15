@@ -312,7 +312,7 @@ Kinetic.Stage.prototype = {
         var targetFound = false;
 
         function detectEvent(shape) {
-            shape._draw(backstageLayer);
+            shape._draw(backstageLayer, true);
             var pos = that.getUserPosition();
             var el = shape.eventListeners;
 

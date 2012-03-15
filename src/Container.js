@@ -54,7 +54,7 @@ Kinetic.Container.prototype = {
         for(var n = 0; n < children.length; n++) {
             var child = children[n];
             if(child.className === "Shape") {
-                child._draw(child.getLayer());
+                child._draw(child.getLayer(), false);
             } else {
                 child._draw();
             }
