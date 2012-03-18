@@ -14,10 +14,10 @@ Kinetic.Stage = function(cont, width, height) {
     this.container = typeof cont === "string" ? document.getElementById(cont) : cont;
     this.width = width;
     this.height = height;
-    this.scale = {
-        x: 1,
-        y: 1
-    };
+
+    this.viewPos = null;            // global view position
+    this.scale = null;              // global scale
+
     this.dblClickWindow = 400;
     this.targetShape = undefined;
     this.clickStart = false;
@@ -135,46 +135,74 @@ Kinetic.Stage.prototype = {
         this.backstageLayer.getCanvas().height = height;
     },
     /**
+     * set view position
+     * @param {int} x
+     * @param {int} y
+     */
+    setViewPos: function(x, y) {
+        if( x === 0 && y === 0 )
+        {
+            this.viewPos = null;
+            return;
+        }
+
+        if( this.viewPos === null )
+        {
+            this.viewPos = { x: x, y: y };
+            return;
+        }
+
+        this.viewPos.x = x;
+        this.viewPos.y = y;
+    },
+    /**
+     * get view position
+     */
+    getViewPos: function() {
+        if( this.viewPos === null )
+            return( {x:0,  y:0} );
+
+        return this.viewPos;
+    },
+    /**
      * set stage scale.  If only one parameter is passed in, then
      * both scaleX and scaleY are set to the parameter
      * @param {int} scaleX
      * @param {int} scaleY
      */
     setScale: function(scaleX, scaleY) {
-        var oldScaleX = this.scale.x;
-        var oldScaleY = this.scale.y;
+        if( scaleY === undefined )
+            scaleY = scaleX;
 
-        if(scaleY) {
-            this.scale.x = scaleX;
-            this.scale.y = scaleY;
-        } else {
-            this.scale.x = scaleX;
-            this.scale.y = scaleX;
+        if( scaleX === 1 && scaleY === 1 )
+        {
+            this.scale = null;
+            return;
         }
 
-        /*
-         * scale all shape positions
-         */
-        var layers = this.children;
-        var that = this;
-        function scaleChildren(children) {
-            for(var i = 0; i < children.length; i++) {
-                var child = children[i];
-                child.x *= that.scale.x / oldScaleX;
-                child.y *= that.scale.y / oldScaleY;
-                if(child.children) {
-                    scaleChildren(child.children);
-                }
-            }
+        if( this.scale === null )
+        {
+            this.scale = { x:scaleX, y:scaleY };
+            return;
         }
 
-        scaleChildren(layers);
+        this.scale.x = scaleX;
+        this.scale.y = scaleY;
     },
     /**
      * get scale
      */
     getScale: function() {
+        if( this.scale === null )
+            return( {x:1, y:1} );
+
         return this.scale;
+    },
+    /**
+     * get offset
+     */
+    getOffset: function() {
+        return this.offset;
     },
     /**
      * clear all layers
@@ -312,6 +340,10 @@ Kinetic.Stage.prototype = {
         var targetFound = false;
 
         function detectEvent(shape) {
+            // Not listening? We're done...
+            if( !shape.isListening )
+                return false;
+            
             shape._draw(backstageLayer, true);
             var pos = that.getUserPosition();
             var el = shape.eventListeners;

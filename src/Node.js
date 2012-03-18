@@ -112,8 +112,9 @@ Kinetic.Node.prototype = {
      * include a namespace to remove an event binding by name
      * such as "click.foobar".
      * @param {String} typesStr
+     * @param {function} [handler]
      */
-    off: function(typesStr) {
+    off: function(typesStr, handler) {
         var types = typesStr.split(" ");
 
         for(var n = 0; n < types.length; n++) {
@@ -121,21 +122,43 @@ Kinetic.Node.prototype = {
             var event = (type.indexOf('touch') === -1) ? 'on' + type : type;
             var parts = event.split(".");
             var baseEvent = parts[0];
+            var i;
+            var name = undefined;
 
-            if(this.eventListeners[baseEvent] && parts.length > 1) {
-                var name = parts[1];
+            if( handler === undefined ) {
+                // Remove all belonging to the event name...
+                if(this.eventListeners[baseEvent] && parts.length > 1) {
+                    name = parts[1];
 
-                for(var i = 0; i < this.eventListeners[baseEvent].length; i++) {
-                    if(this.eventListeners[baseEvent][i].name === name) {
-                        this.eventListeners[baseEvent].splice(i, 1);
-                        if(this.eventListeners[baseEvent].length === 0) {
-                            this.eventListeners[baseEvent] = undefined;
+                    for(i = 0; i < this.eventListeners[baseEvent].length; i++) {
+                        if(this.eventListeners[baseEvent][i].name === name) {
+                            this.eventListeners[baseEvent].splice(i, 1);
+                            if(this.eventListeners[baseEvent].length === 0) {
+                                this.eventListeners[baseEvent] = undefined;
+                            }
+                            break;
                         }
+                    }
+                } else {
+                    this.eventListeners[baseEvent] = undefined;
+                }
+            } else {
+                // Remove the specific handler...
+                if(this.eventListeners[baseEvent] && parts.length > 1) {
+                    name = parts[1];
+                }
+
+                for(i = 0; i < this.eventListeners[baseEvent].length; i++) {
+
+                    if( this.eventListeners[baseEvent][i].handler === handler ) {
+                        if( name !== undefined && this.eventListeners[baseEvent][i].name !== name ) {
+                            continue;
+                        }
+
+                        this.eventListeners[baseEvent].splice(i, 1);
                         break;
                     }
                 }
-            } else {
-                this.eventListeners[baseEvent] = undefined;
             }
         }
     },
@@ -447,7 +470,11 @@ Kinetic.Node.prototype = {
      * get stage associated to node
      */
     getStage: function() {
-        return this.getParent().getStage();
+        var parent = this.getParent();
+        if( parent == null )
+            return null;
+
+        return parent.getStage();
     },
     /**
      * get name

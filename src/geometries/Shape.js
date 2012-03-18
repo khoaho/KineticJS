@@ -106,35 +106,8 @@ Kinetic.Shape.prototype = {
     getTransform: function()
     {
         var transform = new Kinetic.Transform();
-
-        var family = [];
-        family.unshift(this);
-        var parent = this.parent;
-        while (parent.className !== "Stage") {
-            family.unshift(parent);
-            parent = parent.parent;
-        }
-
-        // children transforms
-        for (var n = 0; n < family.length; n++) {
-            var obj = family[n];
-
-            if (obj.x !== 0 || obj.y !== 0) {
-                transform.translate(obj.x, obj.y);
-            }
-            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
-            }
-            if (obj.rotation !== 0) {
-                transform.rotate(obj.rotation);
-            }
-            if (obj.scale.x !== 1 || obj.scale.y !== 1) {
-                transform.scale(obj.scale.x, obj.scale.y);
-            }
-            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
-            }
-        }
+        var stage = this.getStage();
+        this._applyTransform( transform, stage );
 
         return( transform );
     },
@@ -145,61 +118,71 @@ Kinetic.Shape.prototype = {
      */
     _draw: function(layer, isDetectMode) {
         if(this.visible) {
-            var stage = layer.getStage();
             var context = layer.getContext();
-
-            var family = [];
-
-            family.unshift(this);
-            var parent = this.parent;
-            while(parent.className !== "Stage") {
-                family.unshift(parent);
-                parent = parent.parent;
-            }
-
-            // children transforms
-            for(var n = 0; n < family.length; n++) {
-                var obj = family[n];
-
-                context.save();
-                if(obj.x !== 0 || obj.y !== 0) {
-                    context.translate(obj.x, obj.y);
-                }
-                if(obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                    context.translate(obj.centerOffset.x, obj.centerOffset.y);
-                }
-                if(obj.rotation !== 0) {
-                    context.rotate(obj.rotation);
-                }
-                if(obj.scale.x !== 1 || obj.scale.y !== 1) {
-                    context.scale(obj.scale.x, obj.scale.y);
-                }
-                if(obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                    context.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
-                }
-                if(obj.getAbsoluteAlpha() !== 1) {
-                    context.globalAlpha = obj.getAbsoluteAlpha();
-                }
-            }
-
-            // stage transform
             context.save();
-            if(stage && (stage.scale.x !== 1 || stage.scale.y !== 1)) {
-                context.scale(stage.scale.x, stage.scale.y);
-            }
+
+            var stage = layer.getStage();
+            this._applyTransform( context, stage );
 
             this.tempLayer = layer;
             this.drawFunc.call(this, isDetectMode);
 
-            // children restore
-            for(var i = 0; i < family.length; i++) {
-                context.restore();
-            }
-
-            // stage restore
             context.restore();
         }
+    },
+
+    /**
+     * Calculate the transform
+     * @param {CanvasRenderingContext2D|Kinetic.Transform} transform
+     * @param {Kinetic.Stage} stage
+     */
+    _applyTransform: function( transform, stage ) {
+        var family = [];
+        family.unshift(this);
+        var parent = this.parent;
+        while (parent.className !== "Stage") {
+            family.unshift(parent);
+            parent = parent.parent;
+        }
+
+        if(stage) {
+            var stageViewPos = stage.viewPos;
+            if( stageViewPos !== null ) {
+                transform.translate( stageViewPos.x, stageViewPos.y );
+            }
+
+            var stageScale = stage.scale;
+            if( stageScale !== null ) {
+                transform.scale(stageScale.x, stageScale.y);
+            }
+        }
+
+        // children transforms
+        for (var n = 0; n < family.length; n++) {
+            var obj = family[n];
+
+            // Follow the transformation rules SRT (scale rotate translate)
+
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
+            }
+            if (obj.scale.x !== 1 || obj.scale.y !== 1) {
+                transform.scale(obj.scale.x, obj.scale.y);
+            }
+            if (obj.rotation !== 0) {
+                transform.rotate(obj.rotation);
+            }
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
+            }
+            if (obj.x !== 0 || obj.y !== 0) {
+                transform.translate(obj.x, obj.y);
+            }
+        }
+
+        return( transform );
     }
 };
+
 // extend Node
 Kinetic.GlobalObject.extend(Kinetic.Shape, Kinetic.Node);
