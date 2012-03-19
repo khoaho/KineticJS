@@ -140,7 +140,7 @@ Kinetic.Shape.prototype = {
         var family = [];
         family.unshift(this);
         var parent = this.parent;
-        while (parent.className !== "Stage") {
+        while (parent !== null && parent.className !== "Stage") {
             family.unshift(parent);
             parent = parent.parent;
         }
@@ -157,12 +157,14 @@ Kinetic.Shape.prototype = {
             }
         }
 
-        // children transforms
+        // apply children transforms
         for (var n = 0; n < family.length; n++) {
             var obj = family[n];
 
-            // Follow the transformation rules SRT (scale rotate translate)
-
+            // Transformations are applied right to left (i.e. last transform is applied first)...
+            if (obj.x !== 0 || obj.y !== 0) {
+                transform.translate(obj.x, obj.y);
+            }
             if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
                 transform.translate(obj.centerOffset.x, obj.centerOffset.y);
             }
@@ -174,9 +176,6 @@ Kinetic.Shape.prototype = {
             }
             if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
                 transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
-            }
-            if (obj.x !== 0 || obj.y !== 0) {
-                transform.translate(obj.x, obj.y);
             }
         }
 
