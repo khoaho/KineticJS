@@ -100,6 +100,19 @@ Kinetic.Shape.prototype = {
         return this.strokeWidth;
     },
     /**
+     * set composite mode
+     * @param {String} compositeMode
+     */
+    setCompositeMode: function(compositeMode) {
+        this.compositeMode = compositeMode;
+    },
+    /**
+     * get composite mode
+     */
+    getCompositeMode: function() {
+        return this.compositeMode;
+    },
+    /**
      * get the transform
      * @returns {Kinetic.Transform}
      */
@@ -123,6 +136,12 @@ Kinetic.Shape.prototype = {
 
             var stage = layer.getStage();
             this._applyTransform( context, stage );
+
+            if( this.compositeMode !== undefined ) {
+                context.globalCompositeOperation = this.compositeMode;
+            }
+
+            context.globalAlpha = this.getAbsoluteAlpha();
 
             this.tempLayer = layer;
             this.drawFunc.call(this, isDetectMode);
