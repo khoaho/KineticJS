@@ -199,12 +199,6 @@ Kinetic.Stage.prototype = {
         return this.scale;
     },
     /**
-     * get offset
-     */
-    getOffset: function() {
-        return this.offset;
-    },
-    /**
      * clear all layers
      */
     clear: function() {
