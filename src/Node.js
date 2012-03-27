@@ -297,6 +297,11 @@ Kinetic.Node.prototype = {
      */
     moveToTop: function() {
         var index = this.index;
+
+        // Already at the top? We're done...
+        if( index >= (this.parent.children.length-1) )
+            return;
+
         this.parent.children.splice(index, 1);
         this.parent.children.push(this);
         this.parent._setChildrenIndices();
@@ -306,9 +311,11 @@ Kinetic.Node.prototype = {
      */
     moveUp: function() {
         var index = this.index;
-        this.parent.children.splice(index, 1);
-        this.parent.children.splice(index + 1, 0, this);
-        this.parent._setChildrenIndices();
+        if( index < (this.parent.children.length - 1) ) {
+            this.parent.children.splice(index, 1);
+            this.parent.children.splice(index + 1, 0, this);
+            this.parent._setChildrenIndices();
+        }
     },
     /**
      * move node down
@@ -326,6 +333,11 @@ Kinetic.Node.prototype = {
      */
     moveToBottom: function() {
         var index = this.index;
+
+        // Already at the bottom? We're done...
+        if( index <= 0 )
+            return;
+
         this.parent.children.splice(index, 1);
         this.parent.children.unshift(this);
         this.parent._setChildrenIndices();
