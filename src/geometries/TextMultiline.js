@@ -2,12 +2,12 @@
 //  Text
 ///////////////////////////////////////////////////////////////////////
 /**
- * Text constructor
+ * Multi-line text constructor
  * @constructor
  * @augments Kinetic.Shape
  * @param {Object} config
  */
-Kinetic.Text = function(config) {
+Kinetic.TextMultiline = function(config) {
     /*
      * defaults
      */
@@ -21,58 +21,40 @@ Kinetic.Text = function(config) {
         config.padding = 0;
     }
 
-    config.drawFunc = function() {
+    config.drawFunc = function( isDetectMode ) {
         var context = this.getContext();
-        var fontDesc = "";
+        var fontDesc = this.fontSize + "px";
         if( this.fontWeight !== undefined )
-            fontDesc += this.fontWeight + " ";
-        if( this.fontSize !== undefined )
-            fontDesc += this.fontSize + "px ";
+            fontDesc = this.fontWeight + " " + fontDesc;
         if( this.fontFamily !== undefined )
-            fontDesc += this.fontFamily;
+            fontDesc += " " + this.fontFamily;
 
         context.font = fontDesc;
         context.textBaseline = "middle";
-        var metrics = context.measureText(this.text);
-        var textHeight = this.fontSize;
-        var textWidth = metrics.width;
-        var p = this.padding;
-        var x = 0;
-        var y = 0;
 
-        switch (this.align) {
-            case "center":
-                x = textWidth / -2 - p;
-                break;
-            case "right":
-                x = -1 * textWidth - p;
-                break;
+        // Break the text into lines if it hasn't been done yet...
+        if( this.lines === undefined )
+        {
+            this.lines = this.text.split( "\n" );
         }
+
+        var linesNum = this.lines.length;
+        var lineHeight = this.fontSize;
+        var textBlockHeight = lineHeight * linesNum;
+        var p = this.padding;
+        var y = 0;
 
         switch (this.verticalAlign) {
             case "middle":
-                y = textHeight / -2 - p;
+                y = textBlockHeight / -2 - p;
                 break;
             case "bottom":
-                y = -1 * textHeight - p;
+                y = -1 * textBlockHeight - p;
                 break;
         }
 
-        // draw path
-        context.save();
-        context.beginPath();
-        context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
-        context.closePath();
-        this.fillStroke();
-        context.restore();
-
-        var tx = p + x;
-        var ty = textHeight / 2 + p + y;
-
-        // draw text
         if(this.fill !== undefined) {
             context.fillStyle = this.fill;
-            context.fillText(this.text, tx, ty);
         }
         if(this.stroke !== undefined || this.strokeWidth !== undefined) {
             // defaults
@@ -81,18 +63,25 @@ Kinetic.Text = function(config) {
             } else if(this.strokeWidth === undefined) {
                 this.strokeWidth = 2;
             }
+
             context.lineWidth = this.strokeWidth;
             context.strokeStyle = this.stroke;
-            context.strokeText(this.text, tx, ty);
+        }
+
+        for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+        {
+            this._drawTextLine( context, this.lines[lineIndex], y, isDetectMode );
+            y += lineHeight;
         }
     };
+
     // call super constructor
     Kinetic.Shape.apply(this, [config]);
 };
 /*
  * Text methods
  */
-Kinetic.Text.prototype = {
+Kinetic.TextMultiline.prototype = {
     /**
      * set font family
      * @param {String} fontFamily
@@ -177,13 +166,62 @@ Kinetic.Text.prototype = {
      */
     setText: function(text) {
         this.text = text;
+        this.lines = undefined;
     },
     /**
      * get text
      */
     getText: function() {
         return this.text;
+    },
+
+    /**
+     * draw a line of text
+     *
+     * @param {CanvasRenderingContext2D} context
+     * @param {String} textCurr
+     * @param {Number} y
+     * @param {Boolean} isDetectMode
+     *
+     */
+    _drawTextLine: function( context, textCurr, y, isDetectMode )
+    {
+        var metrics = context.measureText(textCurr);
+        var textHeight = this.fontSize;
+        var textWidth = metrics.width;
+        var p = this.padding;
+        var x = 0;
+
+        switch (this.align) {
+            case "center":
+                x = textWidth / -2 - p;
+                break;
+            case "right":
+                x = -1 * textWidth - p;
+                break;
+        }
+
+        // draw path
+        if( isDetectMode )
+        {
+            context.beginPath();
+            context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
+            context.closePath();
+            this.fillStroke();
+            return;
+        }
+
+        var tx = p + x;
+        var ty = textHeight / 2 + p + y;
+
+        // draw text
+        if(this.fill !== undefined) {
+            context.fillText(textCurr, tx, ty);
+        }
+        if(this.stroke !== undefined || this.strokeWidth !== undefined) {
+            context.strokeText(textCurr, tx, ty);
+        }
     }
 };
 // extend Shape
-Kinetic.GlobalObject.extend(Kinetic.Text, Kinetic.Shape);
+Kinetic.GlobalObject.extend(Kinetic.TextMultiline, Kinetic.Shape);

@@ -42,6 +42,7 @@
 		<file name='${dir.src}/geometries/RegularPolygon.js'/>
 		<file name='${dir.src}/geometries/Star.js'/>
 		<file name='${dir.src}/geometries/Text.js'/>
+        <file name='${dir.src}/geometries/TextMultiline.js'/>
 	</filelist>
 	    
 
