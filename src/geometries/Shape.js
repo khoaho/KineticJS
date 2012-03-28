@@ -167,7 +167,7 @@ Kinetic.Shape.prototype = {
         if(stage) {
             var stageViewPos = stage.viewPos;
             if( stageViewPos !== null ) {
-                transform.translate( stageViewPos.x, stageViewPos.y );
+                transform.translate( -stageViewPos.x, -stageViewPos.y );
             }
 
             var stageScale = stage.scale;
