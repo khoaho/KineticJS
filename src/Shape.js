@@ -9,7 +9,7 @@
  * @param {Object} config
  */
 Kinetic.Shape = function(config) {
-    this.className = "Shape";
+    this.className = 'Shape';
 
     // defaults
     if(config.stroke !== undefined || config.strokeWidth !== undefined) {
@@ -31,7 +31,19 @@ Kinetic.Shape = function(config) {
  */
 Kinetic.Shape.prototype = {
     /**
-     * get temporary shape layer context
+     * isPointInShape
+     */
+    isPointInShape: function(backstageLayer,pos){
+        var backstageLayerContext = backstageLayer.getContext();
+        this._draw(backstageLayer);
+        return backstageLayerContext.isPointInPath(pos.x,pos.y);
+    },
+    /**
+     * get layer context where the shape is being drawn.  When
+     * the shape is being rendered, .getContext() returns the context of the
+     * user created layer that contains the shape.  When the event detection
+     * engine is determining whether or not an event has occured on that shape,
+     * .getContext() returns the context of the invisible backstage layer.
      */
     getContext: function() {
         return this.tempLayer.getContext();
@@ -127,9 +139,8 @@ Kinetic.Shape.prototype = {
     /**
      * draw shape
      * @param {Kinetic.Layer} layer Layer that the shape will be drawn on
-     * @param {Boolean} isDetectMode True if drawing in detect mode...
      */
-    _draw: function(layer, isDetectMode) {
+    _draw: function(layer) {
         if(this.visible) {
             var context = layer.getContext();
             context.save();
@@ -144,7 +155,7 @@ Kinetic.Shape.prototype = {
             context.globalAlpha = this.getAbsoluteAlpha();
 
             this.tempLayer = layer;
-            this.drawFunc.call(this, isDetectMode);
+            this.drawFunc.call(this);
 
             context.restore();
         }

@@ -10,10 +10,12 @@
  * @param {Object} config
  */
 Kinetic.Layer = function(config) {
-    this.className = "Layer";
+    this.className = 'Layer';
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.canvas.style.position = 'absolute';
+    this.transitions = [];
+    this.transitionIdCounter = 0;
 
     // call super constructors
     Kinetic.Container.apply(this, []);

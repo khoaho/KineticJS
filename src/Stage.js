@@ -10,8 +10,10 @@
  * @param {int} height
  */
 Kinetic.Stage = function(cont, width, height) {
-    this.className = "Stage";
-    this.container = typeof cont === "string" ? document.getElementById(cont) : cont;
+    this.className = 'Stage';
+    this.container = typeof cont === 'string' ? document.getElementById(cont) : cont;
+    this.content = document.createElement('div');
+
     this.width = width;
     this.height = height;
 
@@ -19,8 +21,11 @@ Kinetic.Stage = function(cont, width, height) {
     this.scale = null;              // global scale
 
     this.dblClickWindow = 400;
-    this.targetShape = undefined;
     this.clickStart = false;
+    this.targetShape = undefined;
+    this.targetFound = false;
+    this.mouseoverShape = undefined;
+    this.mouseoutShape = undefined;
 
     // desktop flags
     this.mousePos = undefined;
@@ -32,49 +37,19 @@ Kinetic.Stage = function(cont, width, height) {
     this.touchStart = false;
     this.touchEnd = false;
 
-    /*
-     * Layer roles
-     *
-     * buffer - canvas compositing
-     * backstage - path detection
-     */
-    this.bufferLayer = new Kinetic.Layer();
-    this.backstageLayer = new Kinetic.Layer();
-
-    // set parents
-    this.bufferLayer.parent = this;
-    this.backstageLayer.parent = this;
-
-    // customize back stage context
-    var backstageLayer = this.backstageLayer;
-    this._stripLayer(backstageLayer);
-
-    this.bufferLayer.getCanvas().style.display = 'none';
-    this.backstageLayer.getCanvas().style.display = 'none';
-
-    // add buffer layer
-    this.bufferLayer.canvas.width = this.width;
-    this.bufferLayer.canvas.height = this.height;
-    this.container.appendChild(this.bufferLayer.canvas);
-
-    // add backstage layer
-    this.backstageLayer.canvas.width = this.width;
-    this.backstageLayer.canvas.height = this.height;
-    this.container.appendChild(this.backstageLayer.canvas);
-
-    this._listen();
-    this._prepareDrag();
-
-    // add stage to global object
-    var stages = Kinetic.GlobalObject.stages;
-    stages.push(this);
-
     // set stage id
     this.id = Kinetic.GlobalObject.idCounter++;
 
     // animation support
     this.isAnimating = false;
     this.onFrameFunc = undefined;
+
+    this._buildDOM();
+    this._listen();
+    this._prepareDrag();
+
+    // add stage to global object
+    Kinetic.GlobalObject.stages.push(this);
 
     // call super constructor
     Kinetic.Container.apply(this, []);
@@ -224,13 +199,13 @@ Kinetic.Stage.prototype = {
                 n++;
                 if(n < layers.length) {
                     addLayer(n);
-                } else {
+                }
+                else {
                     callback(bufferLayer.getCanvas().toDataURL());
                 }
             };
             imageObj.src = dataURL;
         }
-
 
         bufferLayer.clear();
         addLayer(0);
@@ -241,7 +216,7 @@ Kinetic.Stage.prototype = {
      */
     remove: function(layer) {
         // remove layer canvas from dom
-        this.container.removeChild(layer.canvas);
+        this.content.removeChild(layer.canvas);
 
         this._remove(layer);
     },
@@ -252,7 +227,7 @@ Kinetic.Stage.prototype = {
      * @param {function} handler
      */
     on: function(typesStr, handler) {
-        var types = typesStr.split(" ");
+        var types = typesStr.split(' ');
         for(var n = 0; n < types.length; n++) {
             var baseEvent = types[n];
             this.container.addEventListener(baseEvent, handler, false);
@@ -272,7 +247,7 @@ Kinetic.Stage.prototype = {
 
         // draw layer and append canvas to container
         layer.draw();
-        this.container.appendChild(layer.canvas);
+        this.content.appendChild(layer.canvas);
     },
     /**
      * get mouse position for desktop apps
@@ -308,6 +283,180 @@ Kinetic.Stage.prototype = {
         return this;
     },
     /**
+     * detect event
+     * @param {Shape} shape
+     */
+    _detectEvent: function(shape, evt) {
+        // Not listening? We're done...
+        if( !shape.isListening )
+            return false;
+            
+        var isDragging = Kinetic.GlobalObject.drag.moving;
+        var backstageLayer = this.backstageLayer;
+        var go = Kinetic.GlobalObject;
+        var pos = this.getUserPosition();
+        var el = shape.eventListeners;
+
+
+        if(this.targetShape && shape.id === this.targetShape.id) {
+            this.targetFound = true;
+        }
+
+        if(shape.visible && pos !== undefined && shape.isPointInShape(backstageLayer,pos)) {
+            // handle onmousedown
+            if(!isDragging && this.mouseDown) {
+                this.mouseDown = false;
+                this.clickStart = true;
+                shape._handleEvents('onmousedown', evt);
+                return true;
+            }
+            // handle onmouseup & onclick
+            else if(this.mouseUp) {
+                this.mouseUp = false;
+                shape._handleEvents('onmouseup', evt);
+
+                // detect if click or double click occurred
+                if(this.clickStart) {
+                    /*
+                     * if dragging and dropping, don't fire click or dbl click
+                     * event
+                     */
+                    if((!go.drag.moving) || !go.drag.node) {
+                        shape._handleEvents('onclick', evt);
+
+                        if(shape.inDoubleClickWindow) {
+                            shape._handleEvents('ondblclick', evt);
+                        }
+                        shape.inDoubleClickWindow = true;
+                        setTimeout(function() {
+                            shape.inDoubleClickWindow = false;
+                        }, this.dblClickWindow);
+                    }
+                }
+                return true;
+            }
+
+            // handle touchstart
+            else if(this.touchStart) {
+                this.touchStart = false;
+                shape._handleEvents('touchstart', evt);
+
+                if(el.ondbltap && shape.inDoubleClickWindow) {
+                    var events = el.ondbltap;
+                    for(var i = 0; i < events.length; i++) {
+                        events[i].handler.apply(shape, [evt]);
+                    }
+                }
+
+                shape.inDoubleClickWindow = true;
+
+                setTimeout(function() {
+                    shape.inDoubleClickWindow = false;
+                }, this.dblClickWindow);
+                return true;
+            }
+
+            // handle touchend
+            else if(this.touchEnd) {
+                this.touchEnd = false;
+                shape._handleEvents('touchend', evt);
+                return true;
+            }
+
+            /*
+            * NOTE: these event handlers require target shape
+            * handling
+            */
+
+            // handle onmouseover
+            else if(!isDragging && this._isNewTarget(shape, evt)) {
+                /*
+                 * check to see if there are stored mouseout events first.
+                 * if there are, run those before running the onmouseover
+                 * events
+                 */
+                if(this.mouseoutShape) {
+                    this.mouseoverShape = shape;
+                    this.mouseoutShape._handleEvents('onmouseout', evt);
+                    this.mouseoverShape = undefined;
+                }
+
+                shape._handleEvents('onmouseover', evt);
+                this._setTarget(shape);
+                return true;
+            }
+
+            // handle mousemove and touchmove
+            else if(!isDragging) {
+                shape._handleEvents('onmousemove', evt);
+                shape._handleEvents('touchmove', evt);
+                return true;
+            }
+        }
+        // handle mouseout condition
+        else if(!isDragging && this.targetShape && this.targetShape.id === shape.id) {
+            this._setTarget(undefined);
+            this.mouseoutShape = shape;
+            //shape._handleEvents('onmouseout', evt);
+            return true;
+        }
+
+        return false;
+    },
+    /**
+     * set new target
+     */
+    _setTarget: function(shape) {
+        this.targetShape = shape;
+        this.targetFound = true;
+    },
+    /**
+     * check if shape should be a new target
+     */
+    _isNewTarget: function(shape, evt) {
+        if(!this.targetShape || (!this.targetFound && shape.id !== this.targetShape.id)) {
+            /*
+             * check if old target has an onmouseout event listener
+             */
+            if(this.targetShape) {
+                var oldEl = this.targetShape.eventListeners;
+                if(oldEl) {
+                    this.mouseoutShape = this.targetShape;
+                    //this.targetShape._handleEvents('onmouseout', evt);
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+    /**
+     * traverse container children
+     * @param {Container} obj
+     */
+    _traverseChildren: function(obj, evt) {
+        var children = obj.children;
+        // propapgate backwards through children
+        for(var i = children.length - 1; i >= 0; i--) {
+            var child = children[i];
+            if(child.className === 'Shape') {
+                var exit = this._detectEvent(child, evt);
+                if(exit) {
+                    return true;
+                }
+            }
+            else {
+                var exit = this._traverseChildren(child, evt);
+                if(exit) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    },
+    /**
      * handle incoming event
      * @param {Event} evt
      */
@@ -321,9 +470,6 @@ Kinetic.Stage.prototype = {
         this._setTouchPosition(evt);
 
         var backstageLayer = this.backstageLayer;
-        var backstageLayerContext = backstageLayer.getContext();
-        var that = this;
-
         backstageLayer.clear();
 
         /*
@@ -331,151 +477,26 @@ Kinetic.Stage.prototype = {
          * is triggered, n is set to -1 which will break out of the
          * three nested loops
          */
-        var targetFound = false;
-
-        function detectEvent(shape) {
-            // Not listening? We're done...
-            if( !shape.isListening )
-                return false;
-            
-            shape._draw(backstageLayer, true);
-            var pos = that.getUserPosition();
-            var el = shape.eventListeners;
-
-            if(that.targetShape && shape.id === that.targetShape.id) {
-                targetFound = true;
-            }
-
-            if(shape.visible && pos !== undefined && backstageLayerContext.isPointInPath(pos.x, pos.y)) {
-                // handle onmousedown
-                if(that.mouseDown) {
-                    that.mouseDown = false;
-                    that.clickStart = true;
-                    shape._handleEvents("onmousedown", evt);
-                    return true;
-                }
-                // handle onmouseup & onclick
-                else if(that.mouseUp) {
-                    that.mouseUp = false;
-                    shape._handleEvents("onmouseup", evt);
-
-                    // detect if click or double click occurred
-                    if(that.clickStart) {
-                        /*
-                         * if dragging and dropping, don't fire click or dbl click
-                         * event
-                         */
-                        if((!go.drag.moving) || !go.drag.node) {
-                            shape._handleEvents("onclick", evt);
-
-                            if(shape.inDoubleClickWindow) {
-                                shape._handleEvents("ondblclick", evt);
-                            }
-                            shape.inDoubleClickWindow = true;
-                            setTimeout(function() {
-                                shape.inDoubleClickWindow = false;
-                            }, that.dblClickWindow);
-                        }
-                    }
-                    return true;
-                }
-
-                // handle touchstart
-                else if(that.touchStart) {
-                    that.touchStart = false;
-                    shape._handleEvents("touchstart", evt);
-
-                    if(el.ondbltap && shape.inDoubleClickWindow) {
-                        var events = el.ondbltap;
-                        for(var i = 0; i < events.length; i++) {
-                            events[i].handler.apply(shape, [evt]);
-                        }
-                    }
-
-                    shape.inDoubleClickWindow = true;
-
-                    setTimeout(function() {
-                        shape.inDoubleClickWindow = false;
-                    }, that.dblClickWindow);
-                    return true;
-                }
-
-                // handle touchend
-                else if(that.touchEnd) {
-                    that.touchEnd = false;
-                    shape._handleEvents("touchend", evt);
-                    return true;
-                }
-
-                // handle touchmove
-                else if(el.touchmove) {
-                    shape._handleEvents("touchmove", evt);
-                    return true;
-                }
-
-                //this condition is used to identify a new target shape.
-                else if(!that.targetShape || (!targetFound && shape.id !== that.targetShape.id)) {
-                    /*
-                     * check if old target has an onmouseout event listener
-                     */
-                    if(that.targetShape) {
-                        var oldEl = that.targetShape.eventListeners;
-                        if(oldEl) {
-                            that.targetShape._handleEvents("onmouseout", evt);
-                        }
-                    }
-
-                    // set new target shape
-                    that.targetShape = shape;
-
-                    // handle onmouseover
-                    shape._handleEvents("onmouseover", evt);
-                    return true;
-                }
-
-                // handle onmousemove
-                else {
-                    shape._handleEvents("onmousemove", evt);
-                    return true;
+        this.targetFound = false;
+        var shapeDetected = false;
+        for(var n = this.children.length - 1; n >= 0; n--) {
+            var layer = this.children[n];
+            if(layer.visible && n >= 0 && layer.isListening) {
+                if(this._traverseChildren(layer, evt)) {
+                    n = -1;
+                    shapeDetected = true;
                 }
             }
-            // handle mouseout condition
-            else if(that.targetShape && that.targetShape.id === shape.id) {
-                that.targetShape = undefined;
-                shape._handleEvents("onmouseout", evt);
-                return true;
-            }
-
-            return false;
         }
 
-        function traverseChildren(obj) {
-            var children = obj.children;
-            // propapgate backwards through children
-            for(var i = children.length - 1; i >= 0; i--) {
-                var child = children[i];
-                if(child.className === "Shape") {
-                    var exit = detectEvent(child);
-                    if(exit) {
-                        return true;
-                    }
-                } else {
-                    traverseChildren(child);
-                }
-            }
+        /*
+         * if no shape was detected and a mouseout shape has been stored,
+         * then run the onmouseout event handlers
+         */
+        if(!shapeDetected && this.mouseoutShape) {
+            this.mouseoutShape._handleEvents('onmouseout', evt);
+            this.mouseoutShape = undefined;
 
-            return false;
-        }
-
-        if(go.drag.node === undefined) {
-            for(var n = this.children.length - 1; n >= 0; n--) {
-                var layer = this.children[n];
-                if(layer.visible && n >= 0 && layer.isListening) {
-                    if(traverseChildren(layer)) {
-                        n = -1;
-                    }
-                }
-            }
         }
     },
     /**
@@ -486,18 +507,18 @@ Kinetic.Stage.prototype = {
         var that = this;
 
         // desktop events
-        this.container.addEventListener("mousedown", function(evt) {
+        this.container.addEventListener('mousedown', function(evt) {
             that.mouseDown = true;
             that._handleEvent(evt);
         }, false);
 
-        this.container.addEventListener("mousemove", function(evt) {
+        this.container.addEventListener('mousemove', function(evt) {
             that.mouseUp = false;
             that.mouseDown = false;
             that._handleEvent(evt);
         }, false);
 
-        this.container.addEventListener("mouseup", function(evt) {
+        this.container.addEventListener('mouseup', function(evt) {
             that.mouseUp = true;
             that.mouseDown = false;
             that._handleEvent(evt);
@@ -505,26 +526,26 @@ Kinetic.Stage.prototype = {
             that.clickStart = false;
         }, false);
 
-        this.container.addEventListener("mouseover", function(evt) {
+        this.container.addEventListener('mouseover', function(evt) {
             that._handleEvent(evt);
         }, false);
 
-        this.container.addEventListener("mouseout", function(evt) {
+        this.container.addEventListener('mouseout', function(evt) {
             that.mousePos = undefined;
         }, false);
         // mobile events
-        this.container.addEventListener("touchstart", function(evt) {
+        this.container.addEventListener('touchstart', function(evt) {
             evt.preventDefault();
             that.touchStart = true;
             that._handleEvent(evt);
         }, false);
 
-        this.container.addEventListener("touchmove", function(evt) {
+        this.container.addEventListener('touchmove', function(evt) {
             evt.preventDefault();
             that._handleEvent(evt);
         }, false);
 
-        this.container.addEventListener("touchend", function(evt) {
+        this.container.addEventListener('touchend', function(evt) {
             evt.preventDefault();
             that.touchEnd = true;
             that._handleEvent(evt);
@@ -567,9 +588,9 @@ Kinetic.Stage.prototype = {
         var obj = this.container;
         var top = 0;
         var left = 0;
-        while(obj && obj.tagName !== "BODY") {
-            top += obj.offsetTop;
-            left += obj.offsetLeft;
+        while(obj && obj.tagName !== 'BODY') {
+            top += obj.offsetTop - obj.scrollTop;
+            left += obj.offsetLeft - obj.scrollLeft;
             obj = obj.offsetParent;
         }
         return {
@@ -607,7 +628,7 @@ Kinetic.Stage.prototype = {
         if(go.drag.node) {
             if(go.drag.moving) {
                 go.drag.moving = false;
-                go.drag.node._handleEvents("ondragend", evt);
+                go.drag.node._handleEvents('ondragend', evt);
             }
         }
         go.drag.node = undefined;
@@ -618,31 +639,75 @@ Kinetic.Stage.prototype = {
     _prepareDrag: function() {
         var that = this;
 
-        this.on("mousemove touchmove", function(evt) {
+        this.on('mousemove touchmove', function(evt) {
             var go = Kinetic.GlobalObject;
-            if(go.drag.node) {
+            var node = go.drag.node;
+            if(node) {
                 var pos = that.getUserPosition();
-                if(go.drag.node.drag.x) {
-                    go.drag.node.x = pos.x - go.drag.offset.x;
+                var ds = node.dragConstraint;
+                var db = node.dragBounds;
+                if(ds === 'none' || ds === 'horizontal') {
+                    var newX = pos.x - go.drag.offset.x;
+                    if((db.left === undefined || db.left < newX) && (db.right === undefined || db.right > newX)) {
+                        node.x = newX;
+                    }
                 }
-                if(go.drag.node.drag.y) {
-                    go.drag.node.y = pos.y - go.drag.offset.y;
+                if(ds === 'none' || ds === 'vertical') {
+                    var newY = pos.y - go.drag.offset.y;
+                    if((db.top === undefined || db.top < newY) && (db.bottom === undefined || db.bottom > newY)) {
+                        node.y = newY;
+                    }
                 }
                 go.drag.node.getLayer().draw();
 
                 if(!go.drag.moving) {
                     go.drag.moving = true;
                     // execute dragstart events if defined
-                    go.drag.node._handleEvents("ondragstart", evt);
+                    go.drag.node._handleEvents('ondragstart', evt);
                 }
                 // execute user defined ondragmove if defined
-                go.drag.node._handleEvents("ondragmove", evt);
+                go.drag.node._handleEvents('ondragmove', evt);
             }
         }, false);
 
-        this.on("mouseup touchend mouseout", function(evt) {
+        this.on('mouseup touchend mouseout', function(evt) {
             that._endDrag(evt);
         });
+    },
+    /**
+     * build dom
+     */
+    _buildDOM: function() {
+        // content
+        this.content.style.width = this.width + 'px';
+        this.content.style.height = this.height + 'px';
+        this.content.style.position = 'relative';
+        this.content.style.display = 'inline-block';
+        this.content.className = 'kineticjs-content';
+        this.container.appendChild(this.content);
+
+        // default layers
+        this.bufferLayer = new Kinetic.Layer();
+        this.backstageLayer = new Kinetic.Layer();
+
+        // set parents
+        this.bufferLayer.parent = this;
+        this.backstageLayer.parent = this;
+
+        // customize back stage context
+        this._stripLayer(this.backstageLayer);
+        this.bufferLayer.getCanvas().style.display = 'none';
+        this.backstageLayer.getCanvas().style.display = 'none';
+
+        // add buffer layer
+        this.bufferLayer.canvas.width = this.width;
+        this.bufferLayer.canvas.height = this.height;
+        this.content.appendChild(this.bufferLayer.canvas);
+
+        // add backstage layer
+        this.backstageLayer.canvas.width = this.width;
+        this.backstageLayer.canvas.height = this.height;
+        this.content.appendChild(this.backstageLayer.canvas);
     }
 };
 // extend Container

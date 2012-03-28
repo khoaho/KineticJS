@@ -12,10 +12,10 @@ Kinetic.Text = function(config) {
      * defaults
      */
     if(config.align === undefined) {
-        config.align = "left";
+        config.align = 'left';
     }
     if(config.verticalAlign === undefined) {
-        config.verticalAlign = "top";
+        config.verticalAlign = 'top';
     }
     if(config.padding === undefined) {
         config.padding = 0;
@@ -41,19 +41,19 @@ Kinetic.Text = function(config) {
         var y = 0;
 
         switch (this.align) {
-            case "center":
+            case 'center':
                 x = textWidth / -2 - p;
                 break;
-            case "right":
+            case 'right':
                 x = -1 * textWidth - p;
                 break;
         }
 
         switch (this.verticalAlign) {
-            case "middle":
+            case 'middle':
                 y = textHeight / -2 - p;
                 break;
-            case "bottom":
+            case 'bottom':
                 y = -1 * textHeight - p;
                 break;
         }
@@ -147,7 +147,7 @@ Kinetic.Text.prototype = {
     },
     /**
      * set horizontal align of text
-     * @param {String} align align can be "left", "center", or "right"
+     * @param {String} align align can be 'left', 'center', or 'right'
      */
     setAlign: function(align) {
         this.align = align;
