@@ -21,7 +21,7 @@ Kinetic.TextMultiline = function(config) {
         config.padding = 0;
     }
 
-    config.drawFunc = function( isDetectMode ) {
+    config.drawFunc = function() {
         var context = this.getContext();
         var fontDesc = this.fontSize + "px";
         if( this.fontWeight !== undefined )
@@ -70,7 +70,7 @@ Kinetic.TextMultiline = function(config) {
 
         for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
         {
-            this._drawTextLine( context, this.lines[lineIndex], y, isDetectMode );
+            this._drawTextLine( context, this.lines[lineIndex], y );
             y += lineHeight;
         }
     };
@@ -181,10 +181,9 @@ Kinetic.TextMultiline.prototype = {
      * @param {CanvasRenderingContext2D} context
      * @param {String} textCurr
      * @param {Number} y
-     * @param {Boolean} isDetectMode
      *
      */
-    _drawTextLine: function( context, textCurr, y, isDetectMode )
+    _drawTextLine: function( context, textCurr, y )
     {
         var metrics = context.measureText(textCurr);
         var textHeight = this.fontSize;
@@ -202,6 +201,8 @@ Kinetic.TextMultiline.prototype = {
         }
 
         // draw path
+        /*
+        TODO: Implement detection elsewhere
         if( isDetectMode )
         {
             context.beginPath();
@@ -210,7 +211,7 @@ Kinetic.TextMultiline.prototype = {
             this.fillStroke();
             return;
         }
-
+        */
         var tx = p + x;
         var ty = textHeight / 2 + p + y;
 
