@@ -35,7 +35,7 @@ Kinetic.Shape.prototype = {
      */
     isPointInShape: function(backstageLayer,pos){
         var backstageLayerContext = backstageLayer.getContext();
-        this._draw(backstageLayer);
+        this._draw(backstageLayer, true);
         return backstageLayerContext.isPointInPath(pos.x,pos.y);
     },
     /**
@@ -131,22 +131,21 @@ Kinetic.Shape.prototype = {
     getTransform: function()
     {
         var transform = new Kinetic.Transform();
-        var stage = this.getStage();
-        this._applyTransform( transform, stage );
+        this._applyTransform( transform );
 
         return( transform );
     },
     /**
      * draw shape
      * @param {Kinetic.Layer} layer Layer that the shape will be drawn on
+     * @param {Boolean} isForDetection  True if the draw is for point detection
      */
-    _draw: function(layer) {
+    _draw: function(layer, isForDetection) {
         if(this.visible) {
             var context = layer.getContext();
             context.save();
 
-            var stage = layer.getStage();
-            this._applyTransform( context, stage );
+            this._applyTransform( context );
 
             if( this.compositeMode !== undefined ) {
                 context.globalCompositeOperation = this.compositeMode;
@@ -155,7 +154,7 @@ Kinetic.Shape.prototype = {
             context.globalAlpha = this.getAbsoluteAlpha();
 
             this.tempLayer = layer;
-            this.drawFunc.call(this);
+            this.drawFunc.call(this, isForDetection);
 
             context.restore();
         }
@@ -163,16 +162,22 @@ Kinetic.Shape.prototype = {
 
     /**
      * Calculate the transform
-     * @param {CanvasRenderingContext2D|Kinetic.Transform} transform
-     * @param {Kinetic.Stage} stage
+     * @param {CanvasContext|Kinetic.Transform} transform
      */
-    _applyTransform: function( transform, stage ) {
+    _applyTransform: function( transform ) {
         var family = [];
+        var stage = null;
         family.unshift(this);
         var parent = this.parent;
-        while (parent !== null && parent.className !== "Stage") {
-            family.unshift(parent);
-            parent = parent.parent;
+        while (parent !== null) {
+            if( parent.className !== "Stage" ) {
+                family.unshift(parent);
+                parent = parent.parent;
+            } else {
+                // When we reach the stage, we stop...
+                stage = parent;
+                break;
+            }
         }
 
         if(stage) {

@@ -63,7 +63,6 @@ Kinetic.Text = function(config) {
         context.beginPath();
         context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
         context.closePath();
-        this.fillStroke();
         context.restore();
 
         var tx = p + x;

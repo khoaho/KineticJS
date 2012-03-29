@@ -483,8 +483,6 @@ Kinetic.Node.prototype = {
      */
     transitionTo: function(config) {
         var layer = this.getLayer();
-        var that = this;
-        var duration = config.duration * 1000;
         var starts = {};
 
         /*

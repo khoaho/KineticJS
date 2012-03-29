@@ -21,7 +21,6 @@ Kinetic.Image = function(config) {
         context.beginPath();
         context.rect(0, 0, this.width, this.height);
         context.closePath();
-        this.fillStroke();
         context.drawImage(this.image, 0, 0, this.width, this.height);
     };
     // call super constructor

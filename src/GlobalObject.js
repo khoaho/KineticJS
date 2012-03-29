@@ -74,7 +74,6 @@ Kinetic.GlobalObject = {
         var pow = powFunc();
 
         var config = transition.config;
-        var timeDiff = this.frame.timeDiff;
         if(prop !== undefined) {
             var start = transition.starts[key][prop];
             var change = config[key][prop] - start;
@@ -90,7 +89,6 @@ Kinetic.GlobalObject = {
     },
     _chooseTransition: function(transition, key, prop) {
         var config = transition.config;
-        var that = this;
         switch(config.easing) {
             case 'ease-in':
                 this._transitionPow(transition, key, prop, function() {

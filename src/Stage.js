@@ -284,7 +284,7 @@ Kinetic.Stage.prototype = {
     },
     /**
      * detect event
-     * @param {Shape} shape
+     * @param {Kinetic.Shape} shape
      */
     _detectEvent: function(shape, evt) {
         // Not listening? We're done...
@@ -433,7 +433,7 @@ Kinetic.Stage.prototype = {
     },
     /**
      * traverse container children
-     * @param {Container} obj
+     * @param {Kinetic.Container} obj
      */
     _traverseChildren: function(obj, evt) {
         var children = obj.children;
@@ -461,7 +461,6 @@ Kinetic.Stage.prototype = {
      * @param {Event} evt
      */
     _handleEvent: function(evt) {
-        var go = Kinetic.GlobalObject;
         if(!evt) {
             evt = window.event;
         }

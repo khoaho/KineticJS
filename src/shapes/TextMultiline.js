@@ -21,7 +21,7 @@ Kinetic.TextMultiline = function(config) {
         config.padding = 0;
     }
 
-    config.drawFunc = function() {
+    config.drawFunc = function( isForDetection ) {
         var context = this.getContext();
         var fontDesc = this.fontSize + "px";
         if( this.fontWeight !== undefined )
@@ -68,10 +68,23 @@ Kinetic.TextMultiline = function(config) {
             context.strokeStyle = this.stroke;
         }
 
-        for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+        if( !isForDetection )
         {
-            this._drawTextLine( context, this.lines[lineIndex], y );
-            y += lineHeight;
+            for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+            {
+                this._drawTextLine( context, this.lines[lineIndex], y );
+                y += lineHeight;
+            }
+        }
+        else
+        {
+            context.beginPath();
+            for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+            {
+                this._drawTextBounds( context, this.lines[lineIndex], y );
+                y += lineHeight;
+            }
+            context.closePath();
         }
     };
 
@@ -178,7 +191,7 @@ Kinetic.TextMultiline.prototype = {
     /**
      * draw a line of text
      *
-     * @param {CanvasRenderingContext2D} context
+     * @param {CanvasContext} context
      * @param {String} textCurr
      * @param {Number} y
      *
@@ -200,18 +213,6 @@ Kinetic.TextMultiline.prototype = {
                 break;
         }
 
-        // draw path
-        /*
-        TODO: Implement detection elsewhere
-        if( isDetectMode )
-        {
-            context.beginPath();
-            context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
-            context.closePath();
-            this.fillStroke();
-            return;
-        }
-        */
         var tx = p + x;
         var ty = textHeight / 2 + p + y;
 
@@ -222,6 +223,35 @@ Kinetic.TextMultiline.prototype = {
         if(this.stroke !== undefined || this.strokeWidth !== undefined) {
             context.strokeText(textCurr, tx, ty);
         }
+    },
+
+    /**
+     * draw the text bounds
+     *
+     * @param {CanvasContext} context
+     * @param {String} textCurr
+     * @param {Number} y
+     *
+     */
+    _drawTextBounds: function( context, textCurr, y )
+    {
+        var metrics = context.measureText(textCurr);
+        var textHeight = this.fontSize;
+        var textWidth = metrics.width;
+        var p = this.padding;
+        var x = 0;
+
+        switch (this.align) {
+            case "center":
+                x = textWidth / -2 - p;
+                break;
+            case "right":
+                x = -1 * textWidth - p;
+                break;
+        }
+
+        // draw path
+         context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
     }
 };
 // extend Shape
