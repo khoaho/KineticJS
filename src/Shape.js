@@ -22,6 +22,7 @@ Kinetic.Shape = function(config) {
 
     // required
     this.drawFunc = config.drawFunc;
+    this._boundsUntransformed = null;
 
     // call super constructor
     Kinetic.Node.apply(this, [config]);
@@ -37,6 +38,14 @@ Kinetic.Shape.prototype = {
         var backstageLayerContext = backstageLayer.getContext();
         this._draw(backstageLayer, true);
         return backstageLayerContext.isPointInPath(pos.x,pos.y);
+    },
+    /**
+     * invalidates the local bounds
+     */
+    invalidateBoundsLocal: function()
+    {
+        Kinetic.Node.prototype.invalidateBoundsLocal.apply( this );
+        this._boundsUntransformed = null;
     },
     /**
      * get layer context where the shape is being drawn.  When
@@ -125,13 +134,28 @@ Kinetic.Shape.prototype = {
         return this.compositeMode;
     },
     /**
-     * get the transform
+     * get the local transform
      * @returns {Kinetic.Transform}
      */
-    getTransform: function()
+    getBoundsLocal: function()
     {
         var transform = new Kinetic.Transform();
-        this._applyTransform( transform );
+        // Transformations are applied right to left (i.e. last transform is applied first)...
+        if (this.x !== 0 || this.y !== 0) {
+            transform.translate(this.x, this.y);
+        }
+        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
+            transform.translate(this.centerOffset.x, this.centerOffset.y);
+        }
+        if (this.scale.x !== 1 || this.scale.y !== 1) {
+            transform.scale(this.scale.x, this.scale.y);
+        }
+        if (this.rotation !== 0) {
+            transform.rotate(this.rotation);
+        }
+        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
+            transform.translate(-1 * this.centerOffset.x, -1 * this.centerOffset.y);
+        }
 
         return( transform );
     },
@@ -159,62 +183,24 @@ Kinetic.Shape.prototype = {
             context.restore();
         }
     },
-
     /**
-     * Calculate the transform
-     * @param {CanvasContext|Kinetic.Transform} transform
+     * return the untransformed node bounds
+     * @returns {Kinetic.BoundsRect}
      */
-    _applyTransform: function( transform ) {
-        var family = [];
-        var stage = null;
-        family.unshift(this);
-        var parent = this.parent;
-        while (parent !== null) {
-            if( parent.className !== "Stage" ) {
-                family.unshift(parent);
-                parent = parent.parent;
-            } else {
-                // When we reach the stage, we stop...
-                stage = parent;
-                break;
-            }
-        }
+    _getNodeBoundsUntransformed: function()
+    {
+        if( this._boundsUntransformed === null )
+            this._boundsUntransformed = this._calcNodeBoundsLocalUntransformed();
 
-        if(stage) {
-            var stageViewPos = stage.viewPos;
-            if( stageViewPos !== null ) {
-                transform.translate( -stageViewPos.x, -stageViewPos.y );
-            }
-
-            var stageScale = stage.scale;
-            if( stageScale !== null ) {
-                transform.scale(stageScale.x, stageScale.y);
-            }
-        }
-
-        // apply children transforms
-        for (var n = 0; n < family.length; n++) {
-            var obj = family[n];
-
-            // Transformations are applied right to left (i.e. last transform is applied first)...
-            if (obj.x !== 0 || obj.y !== 0) {
-                transform.translate(obj.x, obj.y);
-            }
-            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
-            }
-            if (obj.scale.x !== 1 || obj.scale.y !== 1) {
-                transform.scale(obj.scale.x, obj.scale.y);
-            }
-            if (obj.rotation !== 0) {
-                transform.rotate(obj.rotation);
-            }
-            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
-            }
-        }
-
-        return( transform );
+        return( this._boundsUntransformed.clone() );
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        return( new Kinetic.BoundsRect( 0, 0, 0, 0 ) );
     }
 };
 

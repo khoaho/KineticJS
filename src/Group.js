@@ -41,6 +41,28 @@ Kinetic.Group.prototype = {
         if(this.visible) {
             this._drawChildren();
         }
+    },
+    /**
+     * return the untransformed node bounds
+     * @returns {Kinetic.BoundsRect}
+     */
+    _getNodeBoundsUntransformed: function()
+    {
+        var children = this.getChildren(),
+            childrenNum = children.length,
+            childIndex,
+            boundsUntransformed;
+
+        if( childrenNum == 0 ) {
+            return( Kinetic.BoundsRect(0, 0, 0 , 0) );
+        }
+
+        boundsUntransformed = Kinetic.BoundsRect.fromBounds( children[0].getBoundsLocal() );
+        for( childIndex = 1; childIndex < childrenNum; childIndex++ ) {
+            boundsUntransformed.encloseRect( children[1].getBoundsLocal() );
+        }
+
+        return( boundsUntransformed );
     }
 };
 

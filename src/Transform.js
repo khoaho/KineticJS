@@ -1,6 +1,13 @@
 /* 
  * Transform class
  *
+ * Here's the picture of the transformation
+ *
+ * -           -
+ * | m0  m2 m4 |
+ * | m1  m3 m5 |
+ * | 0   0  1  |
+ * -           -
  * Copyright 2012 Wappworks Studios
  * All rights reserved.
  */
@@ -136,5 +143,13 @@ p.transformPoint = function(px, py) {
  */
 p.getTranslation = function() {
     return { x:this.m[4], y:this.m[5] };
+};
+
+/**
+ * Determines if the transform has rotation
+ * @returns {Boolean} true if it has rotation. false otherwise
+ */
+p.hasRotation = function() {
+    return( this.m[1] != 0 );
 };
 

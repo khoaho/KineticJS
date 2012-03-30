@@ -28,6 +28,7 @@ Kinetic.Rect.prototype = {
      */
     setWidth: function(width) {
         this.width = width;
+        this.invalidateBoundsLocal();
     },
     /**
      * get width
@@ -41,6 +42,7 @@ Kinetic.Rect.prototype = {
      */
     setHeight: function(height) {
         this.height = height;
+        this.invalidateBoundsLocal();
     },
     /**
      * get height
@@ -56,6 +58,15 @@ Kinetic.Rect.prototype = {
     setSize: function(width, height) {
         this.width = width;
         this.height = height;
+        this.invalidateBoundsLocal();
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        return( new Kinetic.BoundsRect(0, 0, this.width, this.height) );
     }
 };
 

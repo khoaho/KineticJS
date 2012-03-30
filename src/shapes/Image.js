@@ -49,6 +49,7 @@ Kinetic.Image.prototype = {
      */
     setWidth: function(width) {
         this.width = width;
+        this.invalidateBoundsLocal();
     },
     /**
      * get width
@@ -62,6 +63,7 @@ Kinetic.Image.prototype = {
      */
     setHeight: function(height) {
         this.height = height;
+        this.invalidateBoundsLocal();
     },
     /**
      * get height
@@ -77,7 +79,20 @@ Kinetic.Image.prototype = {
     setSize: function(width, height) {
         this.width = width;
         this.height = height;
+        this.invalidateBoundsLocal();
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        if( this.width == null || this.height == null )
+            return( Kinetic.Image.base._calcNodeBoundsLocalUntransformed.apply(this) );
+
+        return( new Kinetic.BoundsRect(0, 0, this.width, this.height) );
     }
 };
 // extend Shape
 Kinetic.GlobalObject.extend(Kinetic.Image, Kinetic.Shape);
+Kinetic.Image.base = Kinetic.Shape.prototype;

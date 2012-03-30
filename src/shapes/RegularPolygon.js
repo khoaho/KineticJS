@@ -29,24 +29,12 @@ Kinetic.RegularPolygon = function(config) {
  */
 Kinetic.RegularPolygon.prototype = {
     /**
-     * set number of points
-     * @param {int} points
-     */
-    setPoints: function(points) {
-        this.points = points;
-    },
-    /**
-     * get number of points
-     */
-    getPoints: function() {
-        return this.points;
-    },
-    /**
      * set radius
      * @param {Number} radius
      */
     setRadius: function(radius) {
         this.radius = radius;
+        this.invalidateBoundsLocal();
     },
     /**
      * get radius
@@ -66,6 +54,15 @@ Kinetic.RegularPolygon.prototype = {
      */
     getSides: function() {
         return this.sides;
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var diameter = this.radius * 2;
+        return( new Kinetic.BoundsRect(this.x - this.radius, this.y - this.radius, diameter, diameter) );
     }
 };
 

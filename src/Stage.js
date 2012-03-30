@@ -94,8 +94,7 @@ Kinetic.Stage.prototype = {
         var layers = this.children;
         for(var n = 0; n < layers.length; n++) {
             var layer = layers[n];
-            layer.getCanvas().width = width;
-            layer.getCanvas().height = height;
+            layer.setSize( width, height );
             layer.draw();
         }
 
@@ -104,10 +103,8 @@ Kinetic.Stage.prototype = {
         this.height = height;
 
         // set buffer layer and backstage layer sizes
-        this.bufferLayer.getCanvas().width = width;
-        this.bufferLayer.getCanvas().height = height;
-        this.backstageLayer.getCanvas().width = width;
-        this.backstageLayer.getCanvas().height = height;
+        this.bufferLayer.setSize( width, height );
+        this.backstageLayer.setSize( width, height );
     },
     /**
      * set view position
@@ -241,8 +238,7 @@ Kinetic.Stage.prototype = {
         if(layer.name) {
             this.childrenNames[layer.name] = layer;
         }
-        layer.canvas.width = this.width;
-        layer.canvas.height = this.height;
+        layer.setSize( this.width, this.height );
         this._add(layer);
 
         // draw layer and append canvas to container
@@ -435,20 +431,18 @@ Kinetic.Stage.prototype = {
      * traverse container children
      * @param {Kinetic.Container} obj
      */
-    _traverseChildren: function(obj, evt) {
-        var children = obj.children;
+    _eventTraverseChildren: function(obj, evt) {
+        var children = obj._getChildrenDrawList();
         // propapgate backwards through children
         for(var i = children.length - 1; i >= 0; i--) {
             var child = children[i];
             if(child.className === 'Shape') {
-                var exit = this._detectEvent(child, evt);
-                if(exit) {
+                if( this._detectEvent(child, evt) ) {
                     return true;
                 }
             }
             else {
-                var exit = this._traverseChildren(child, evt);
-                if(exit) {
+                if( this._eventTraverseChildren(child, evt) ) {
                     return true;
                 }
             }
@@ -481,7 +475,7 @@ Kinetic.Stage.prototype = {
         for(var n = this.children.length - 1; n >= 0; n--) {
             var layer = this.children[n];
             if(layer.visible && n >= 0 && layer.isListening) {
-                if(this._traverseChildren(layer, evt)) {
+                if(this._eventTraverseChildren(layer, evt)) {
                     n = -1;
                     shapeDetected = true;
                 }
@@ -699,13 +693,11 @@ Kinetic.Stage.prototype = {
         this.backstageLayer.getCanvas().style.display = 'none';
 
         // add buffer layer
-        this.bufferLayer.canvas.width = this.width;
-        this.bufferLayer.canvas.height = this.height;
+        this.bufferLayer.setSize( this.width, this.height );
         this.content.appendChild(this.bufferLayer.canvas);
 
         // add backstage layer
-        this.backstageLayer.canvas.width = this.width;
-        this.backstageLayer.canvas.height = this.height;
+        this.backstageLayer.setSize( this.width, this.height );
         this.content.appendChild(this.backstageLayer.canvas);
     }
 };

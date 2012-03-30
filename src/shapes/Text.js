@@ -98,6 +98,7 @@ Kinetic.Text.prototype = {
      */
     setFontFamily: function(fontFamily) {
         this.fontFamily = fontFamily;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font family
@@ -111,6 +112,7 @@ Kinetic.Text.prototype = {
      */
     setFontSize: function(fontSize) {
         this.fontSize = fontSize;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font size
@@ -124,6 +126,7 @@ Kinetic.Text.prototype = {
      */
     setFontWeight: function(fontWeight) {
         this.fontWeight = fontWeight;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font weight
@@ -137,6 +140,7 @@ Kinetic.Text.prototype = {
      */
     setPadding: function(padding) {
         this.padding = padding;
+        this.invalidateBoundsLocal();
     },
     /**
      * get padding
@@ -150,6 +154,7 @@ Kinetic.Text.prototype = {
      */
     setAlign: function(align) {
         this.align = align;
+        this.invalidateBoundsLocal();
     },
     /**
      * get horizontal align
@@ -163,6 +168,7 @@ Kinetic.Text.prototype = {
      */
     setVerticalAlign: function(verticalAlign) {
         this.verticalAlign = verticalAlign;
+        this.invalidateBoundsLocal();
     },
     /**
      * get vertical align
@@ -176,12 +182,59 @@ Kinetic.Text.prototype = {
      */
     setText: function(text) {
         this.text = text;
+        this.invalidateBoundsLocal();
     },
     /**
      * get text
      */
     getText: function() {
         return this.text;
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var context = Kinetic.GlobalObject.getTempCanvasContext();
+
+        context.save();
+        var fontDesc = "";
+        if( this.fontWeight !== undefined )
+            fontDesc += this.fontWeight + " ";
+        if( this.fontSize !== undefined )
+            fontDesc += this.fontSize + "px ";
+        if( this.fontFamily !== undefined )
+            fontDesc += this.fontFamily;
+
+        context.font = fontDesc;
+        var metrics = context.measureText(this.text);
+        var textHeight = this.fontSize;
+        var textWidth = metrics.width;
+        var p = this.padding;
+        var x = 0;
+        var y = 0;
+
+        switch (this.align) {
+            case 'center':
+                x = textWidth / -2 - p;
+                break;
+            case 'right':
+                x = -1 * textWidth - p;
+                break;
+        }
+
+        switch (this.verticalAlign) {
+            case 'middle':
+                y = textHeight / -2 - p;
+                break;
+            case 'bottom':
+                y = -1 * textHeight - p;
+                break;
+        }
+        context.restore();
+
+        return( new Kinetic.BoundsRect(x, y, textWidth, textHeight) );
     }
 };
 // extend Shape

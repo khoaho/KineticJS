@@ -30,24 +30,12 @@ Kinetic.Star = function(config) {
  */
 Kinetic.Star.prototype = {
     /**
-     * set points array
-     * @param {Array} points
-     */
-    setPoints: function(points) {
-        this.points = points;
-    },
-    /**
-     * get points array
-     */
-    getPoints: function() {
-        return this.points;
-    },
-    /**
      * set outer radius
      * @param {Number} radius
      */
     setOuterRadius: function(radius) {
         this.outerRadius = radius;
+        this.invalidateBoundsLocal();
     },
     /**
      * get outer radius
@@ -67,6 +55,15 @@ Kinetic.Star.prototype = {
      */
     getInnerRadius: function() {
         return this.innerRadius;
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var diameter = this.outerRadius * 2;
+        return( new Kinetic.BoundsRect(this.x - this.outerRadius, this.y - this.outerRadius, diameter, diameter) );
     }
 };
 // extend Shape

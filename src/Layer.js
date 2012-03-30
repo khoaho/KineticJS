@@ -40,6 +40,17 @@ Kinetic.Layer.prototype = {
         context.clearRect(0, 0, canvas.width, canvas.height);
     },
     /**
+     * set the layer size
+     * @param {Number} width
+     * @param {Number} height
+     */
+    setSize: function( width, height ) {
+        var canvas = this.getCanvas();
+        canvas.width = width;
+        canvas.height = height;
+        this.invalidateBoundsLocal();
+    },
+    /**
      * get layer canvas
      */
     getCanvas: function() {
@@ -57,6 +68,7 @@ Kinetic.Layer.prototype = {
      */
     add: function(child) {
         this._add(child);
+        this.invalidateBoundsLocal();
     },
     /**
      * remove a child from the layer
@@ -64,6 +76,7 @@ Kinetic.Layer.prototype = {
      */
     remove: function(child) {
         this._remove(child);
+        this.invalidateBoundsLocal();
     },
     /**
      * private draw children
@@ -73,6 +86,16 @@ Kinetic.Layer.prototype = {
         if(this.visible) {
             this._drawChildren();
         }
+    },
+    /**
+     * return the untransformed node bounds
+     * @returns {Kinetic.BoundsRect}
+     */
+    _getNodeBoundsUntransformed: function()
+    {
+        // The bounds for this node is the canvas bounds...
+        var canvas = this.getCanvas();
+        return( Kinetic.BoundsRect(0, 0, canvas.width, canvas.height) );
     }
 };
 // Extend Container and Node

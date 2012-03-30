@@ -9,6 +9,7 @@
 Kinetic.Container = function() {
     this.children = [];
     this.childrenNames = {};
+    this.sortFn = null;
 };
 /*
  * Container methods
@@ -36,6 +37,14 @@ Kinetic.Container.prototype = {
         }
     },
     /**
+     * set the sort functionality to use when drawing the children.
+     * @param {Function} sortFn     sortFn( node1:Kinetic.Node, node2:Kinetic.Node ):Number. Return -1 if node1 is
+     *                              drawn before node2, 0 if no sorting required, 1 if node2 is drawn before node1
+     */
+    setDrawSortFunction: function( sortFn ) {
+        this.sortFn = sortFn;
+    },
+    /**
      * remove child from container
      * @param {Kinetic.Node} child
      */
@@ -50,7 +59,13 @@ Kinetic.Container.prototype = {
      * draw children
      */
     _drawChildren: function() {
-        var children = this.children;
+        var children = this._getChildrenDrawList();
+        if( typeof(this.sortFn) === "function" )
+        {
+            children = children.slice();
+            children.sort( this.sortFn );
+        }
+
         for(var n = 0; n < children.length; n++) {
             var child = children[n];
             if(child.className === 'Shape') {
@@ -100,5 +115,11 @@ Kinetic.Container.prototype = {
                 this.content.appendChild(this.children[n].canvas);
             }
         }
+    },
+    /**
+     * get the list of children to draw
+     */
+    _getChildrenDrawList: function() {
+        return this.children;
     }
 };

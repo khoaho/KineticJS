@@ -68,9 +68,10 @@ Kinetic.TextMultiline = function(config) {
             context.strokeStyle = this.stroke;
         }
 
+        var lineIndex;
         if( !isForDetection )
         {
-            for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+            for( lineIndex = 0; lineIndex < linesNum; lineIndex++ )
             {
                 this._drawTextLine( context, this.lines[lineIndex], y );
                 y += lineHeight;
@@ -79,7 +80,7 @@ Kinetic.TextMultiline = function(config) {
         else
         {
             context.beginPath();
-            for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+            for( lineIndex = 0; lineIndex < linesNum; lineIndex++ )
             {
                 this._drawTextBounds( context, this.lines[lineIndex], y );
                 y += lineHeight;
@@ -101,6 +102,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setFontFamily: function(fontFamily) {
         this.fontFamily = fontFamily;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font family
@@ -114,6 +116,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setFontSize: function(fontSize) {
         this.fontSize = fontSize;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font size
@@ -127,6 +130,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setFontWeight: function(fontWeight) {
         this.fontWeight = fontWeight;
+        this.invalidateBoundsLocal();
     },
     /**
      * get font weight
@@ -140,6 +144,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setPadding: function(padding) {
         this.padding = padding;
+        this.invalidateBoundsLocal();
     },
     /**
      * get padding
@@ -153,6 +158,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setAlign: function(align) {
         this.align = align;
+        this.invalidateBoundsLocal();
     },
     /**
      * get horizontal align
@@ -166,6 +172,7 @@ Kinetic.TextMultiline.prototype = {
      */
     setVerticalAlign: function(verticalAlign) {
         this.verticalAlign = verticalAlign;
+        this.invalidateBoundsLocal();
     },
     /**
      * get vertical align
@@ -180,6 +187,7 @@ Kinetic.TextMultiline.prototype = {
     setText: function(text) {
         this.text = text;
         this.lines = undefined;
+        this.invalidateBoundsLocal();
     },
     /**
      * get text
@@ -252,6 +260,69 @@ Kinetic.TextMultiline.prototype = {
 
         // draw path
          context.rect(x, y, textWidth + p * 2, textHeight + p * 2);
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var context = Kinetic.GlobalObject.getTempCanvasContext();
+
+        context.save();
+        var fontDesc = this.fontSize + "px";
+        if( this.fontWeight !== undefined )
+            fontDesc = this.fontWeight + " " + fontDesc;
+        if( this.fontFamily !== undefined )
+            fontDesc += " " + this.fontFamily;
+
+        context.font = fontDesc;
+        context.textBaseline = "middle";
+
+        // Break the text into lines if it hasn't been done yet...
+        if( this.lines === undefined )
+        {
+            this.lines = this.text.split( "\n" );
+        }
+
+        var linesNum = this.lines.length;
+        var lineHeight = this.fontSize;
+        var textBlockHeight = lineHeight * linesNum;
+        var p = this.padding;
+        var top = 0;
+
+        switch (this.verticalAlign) {
+            case "middle":
+                top = textBlockHeight / -2 - p;
+                break;
+            case "bottom":
+                top = -1 * textBlockHeight - p;
+                break;
+        }
+
+        var leftMin = Number.MAX_VALUE;
+        var rightMax = Number.MIN_VALUE;
+        for( var lineIndex = 0; lineIndex < linesNum; lineIndex++ )
+        {
+            var metrics = context.measureText(this.lines[lineIndex]);
+            var textWidth = metrics.width;
+
+            var left = 0;
+            switch (this.align) {
+                case "center":
+                    left = textWidth / -2 - p;
+                    break;
+                case "right":
+                    left = -1 * textWidth - p;
+                    break;
+            }
+
+            leftMin = Math.min( leftMin, left );
+            rightMax = Math.max( rightMax, left + textWidth );
+        }
+        context.restore();
+
+        return( new Kinetic.BoundsRect(leftMin, top, rightMax - leftMin, textBlockHeight) );
     }
 };
 // extend Shape

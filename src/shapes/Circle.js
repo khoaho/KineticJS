@@ -28,12 +28,22 @@ Kinetic.Circle.prototype = {
      */
     setRadius: function(radius) {
         this.radius = radius;
+        this.invalidateBoundsLocal();
     },
     /**
      * get radius
      */
     getRadius: function() {
         return this.radius;
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var diameter = this.radius * 2;
+        return( new Kinetic.BoundsRect(this.x - this.radius, this.y - this.radius, diameter, diameter) );
     }
 };
 

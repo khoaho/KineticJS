@@ -31,12 +31,38 @@ Kinetic.Polygon.prototype = {
      */
     setPoints: function(points) {
         this.points = points;
+        this.invalidateBoundsLocal();
     },
     /**
      * get points array
      */
     getPoints: function() {
         return this.points;
+    },
+    /**
+     * calculates the untransformed local bounds for the node
+     * @returns {Kinetic.BoundsRect}
+     */
+    _calcNodeBoundsLocalUntransformed: function()
+    {
+        var points = this.points,
+            pointsNum = points.length,
+            index,
+            pointCurr,
+            boundsUntransformed;
+
+        if( pointsNum == 0 ) {
+            return( Kinetic.BoundsRect(0, 0, 0, 0) );
+        }
+
+        pointCurr = points[0];
+        boundsUntransformed = Kinetic.BoundsRect.fromPoint( pointCurr.x, pointCurr.y );
+        for( index = 1; index < pointsNum; index++ ) {
+            pointCurr = points[index];
+            boundsUntransformed.enclosePoint( pointCurr.x, pointCurr.y );
+        }
+
+        return( boundsUntransformed );
     }
 };
 

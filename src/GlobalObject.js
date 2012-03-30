@@ -13,6 +13,7 @@ var Kinetic = {};
 Kinetic.GlobalObject = {
     stages: [],
     idCounter: 0,
+    tempCanvas: null,
     frame: {
         time: 0,
         timeDiff: 0,
@@ -71,19 +72,22 @@ Kinetic.GlobalObject = {
         }
     },
     _transitionPow: function(transition, key, prop, powFunc) {
-        var pow = powFunc();
+        var pow = powFunc(),
+            start,
+            change,
+            b;
 
         var config = transition.config;
         if(prop !== undefined) {
-            var start = transition.starts[key][prop];
-            var change = config[key][prop] - start;
-            var b = change / (Math.pow(config.duration * 1000, pow));
+            start = transition.starts[key][prop];
+            change = config[key][prop] - start;
+            b = change / (Math.pow(config.duration * 1000, pow));
             transition.node[key][prop] = b * Math.pow(transition.time, pow) + start;
         }
         else {
-            var start = transition.starts[key];
-            var change = config[key] - start;
-            var b = change / (Math.pow(config.duration * 1000, pow));
+            start = transition.starts[key];
+            change = config[key] - start;
+            b = change / (Math.pow(config.duration * 1000, pow));
             transition.node[key] = b * Math.pow(transition.time, pow) + start;
         }
     },
@@ -118,19 +122,25 @@ Kinetic.GlobalObject = {
     _runTransition: function(transition) {
         var config = transition.config;
         for(var key in config) {
-            if(config.hasOwnProperty(key) && key !== 'duration' && key !== 'easing' && key !== 'callback') {
-                if(config[key].x !== undefined || config[key].y !== undefined) {
-                    var propArray = ['x', 'y'];
-                    for(var n = 0; n < propArray.length; n++) {
-                        var prop = propArray[n];
-                        if(config[key][prop] !== undefined) {
-                            this._chooseTransition(transition, key, prop);
-                        }
+            if( !config.hasOwnProperty(key) ) {
+                continue;
+            }
+
+            if( key === 'duration' || key === 'easing' || key === 'callback') {
+                continue;
+            }
+
+            if(config[key].x !== undefined || config[key].y !== undefined) {
+                var propArray = ['x', 'y'];
+                for(var n = 0; n < propArray.length; n++) {
+                    var prop = propArray[n];
+                    if(config[key][prop] !== undefined) {
+                        this._chooseTransition(transition, key, prop);
                     }
                 }
-                else {
-                    this._chooseTransition(transition, key);
-                }
+            }
+            else {
+                this._chooseTransition(transition, key);
             }
         }
     },
@@ -205,6 +215,12 @@ Kinetic.GlobalObject = {
         if(this._isaCanvasAnimating()) {
             that._animationLoop();
         }
+    },
+    getTempCanvasContext: function() {
+        if( this.tempCanvas == null )
+            this.tempCanvas = document.createElement('canvas');
+
+        return( this.tempCanvas.getContext('2d') );
     }
 };
 

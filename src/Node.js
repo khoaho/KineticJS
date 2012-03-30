@@ -28,6 +28,8 @@ Kinetic.Node = function(config) {
     this.dragConstraint = 'none';
     this.dragBounds = {};
     this._draggable = false;
+    this._boundsNoTranslation = null;
+    this._boundsUntransformed = null;
 
     // set properties from config
     if(config) {
@@ -187,6 +189,7 @@ Kinetic.Node.prototype = {
             this.scale.x = scaleX;
             this.scale.y = scaleX;
         }
+        this._boundsNoTranslation = null;
     },
     /**
      * get scale
@@ -244,6 +247,7 @@ Kinetic.Node.prototype = {
      */
     setRotation: function(theta) {
         this.rotation = theta;
+        this._boundsNoTranslation = null;
     },
     /**
      * set node rotation in degrees
@@ -251,6 +255,7 @@ Kinetic.Node.prototype = {
      */
     setRotationDeg: function(deg) {
         this.rotation = (deg * Math.PI / 180);
+        this._boundsNoTranslation = null;
     },
     /**
      * get rotation in radians
@@ -270,6 +275,7 @@ Kinetic.Node.prototype = {
      */
     rotate: function(theta) {
         this.rotation += theta;
+        this._boundsNoTranslation = null;
     },
     /**
      * rotate node by an amount in degrees
@@ -277,6 +283,75 @@ Kinetic.Node.prototype = {
      */
     rotateDeg: function(deg) {
         this.rotation += (deg * Math.PI / 180);
+        this._boundsNoTranslation = null;
+    },
+    /**
+     * get the transform from local to view
+     * @returns {Kinetic.Transform}
+     */
+    getTransformView: function()
+    {
+        var transform = new Kinetic.Transform();
+        this._applyTransform( transform );
+
+        return( transform );
+    },
+    /**
+     * get the local transform
+     * @returns {Kinetic.Transform}
+     */
+    getTransformLocal: function()
+    {
+        var transform = new Kinetic.Transform();
+
+        // Transformations are applied right to left (i.e. last transform is applied first)...
+        if (this.x !== 0 || this.y !== 0) {
+            transform.translate(this.x, this.y);
+        }
+        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
+            transform.translate(this.centerOffset.x, this.centerOffset.y);
+        }
+        if (this.scale.x !== 1 || this.scale.y !== 1) {
+            transform.scale(this.scale.x, this.scale.y);
+        }
+        if (this.rotation !== 0) {
+            transform.rotate(this.rotation);
+        }
+        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
+            transform.translate(-1 * this.centerOffset.x, -1 * this.centerOffset.y);
+        }
+
+        return( transform );
+    },
+    /**
+     * get the local bounds
+     * @returns {Kinetic.BoundsRect}
+     */
+    getBoundsLocal: function()
+    {
+        if( this._boundsNoTranslation === null ) {
+            var prevX = this.x;
+            var prevY = this.y;
+            this.x = 0;
+            this.y = 0;
+            var transform = this.getTransformLocal();
+            this.x = prevX;
+            this.y = prevY;
+
+            this._boundsNoTranslation = this._getNodeBoundsUntransformed().transform( transform );
+        }
+
+        var bounds = this._boundsNoTranslation.clone();
+        bounds.x += this.x;
+        bounds.y += this.y;
+        return( bounds );
+    },
+    /**
+     * invalidates the local bounds
+     */
+    invalidateBoundsLocal: function()
+    {
+        this._boundsNoTranslation = null;
     },
     /**
      * listen or don't listen to events
@@ -463,6 +538,7 @@ Kinetic.Node.prototype = {
     setCenterOffset: function(x, y) {
         this.centerOffset.x = x;
         this.centerOffset.y = y;
+        this._boundsNoTranslation = null;
     },
     /**
      * get center offset
@@ -493,20 +569,26 @@ Kinetic.Node.prototype = {
         Kinetic.GlobalObject._clearTransition(this);
 
         for(var key in config) {
-            if(config.hasOwnProperty(key) && key !== 'duration' && key !== 'easing' && key !== 'callback') {
-                if(config[key].x !== undefined || config[key].y !== undefined) {
-                    starts[key] = {};
-                    var propArray = ['x', 'y'];
-                    for(var n = 0; n < propArray.length; n++) {
-                        var prop = propArray[n];
-                        if(config[key][prop] !== undefined) {
-                            starts[key][prop] = this[key][prop];
-                        }
+            if( !config.hasOwnProperty(key) ) {
+                continue;
+            }
+
+            if( key === 'duration' || key === 'easing' || key === 'callback') {
+                continue;
+            }
+
+            if(config[key].x !== undefined || config[key].y !== undefined) {
+                starts[key] = {};
+                var propArray = ['x', 'y'];
+                for(var n = 0; n < propArray.length; n++) {
+                    var prop = propArray[n];
+                    if(config[key][prop] !== undefined) {
+                        starts[key][prop] = this[key][prop];
                     }
                 }
-                else {
-                    starts[key] = this[key];
-                }
+            }
+            else {
+                starts[key] = this[key];
             }
         }
 
@@ -615,5 +697,69 @@ Kinetic.Node.prototype = {
         if(!evt.cancelBubble && node.parent.className !== 'Stage') {
             this._handleEvent(node.parent, mouseoverParent, mouseoutParent, eventType, evt);
         }
+    },
+    /**
+     * return the untransformed node bounds
+     * @returns {Kinetic.BoundsRect}
+     */
+    _getNodeBoundsUntransformed: function()
+    {
+        return( new Kinetic.BoundsRect( 0, 0, 0, 0 ) );
+    },
+    /**
+     * Calculate the transform
+     * @param {CanvasContext|Kinetic.Transform} transform
+     */
+    _applyTransform: function( transform ) {
+        var family = [];
+        var stage = null;
+        family.unshift(this);
+        var parent = this.parent;
+        while (parent !== null) {
+            if( parent.className !== "Stage" ) {
+                family.unshift(parent);
+                parent = parent.parent;
+            } else {
+                // When we reach the stage, we stop...
+                stage = parent;
+                break;
+            }
+        }
+
+        if(stage) {
+            var stageViewPos = stage.viewPos;
+            if( stageViewPos !== null ) {
+                transform.translate( -stageViewPos.x, -stageViewPos.y );
+            }
+
+            var stageScale = stage.scale;
+            if( stageScale !== null ) {
+                transform.scale(stageScale.x, stageScale.y);
+            }
+        }
+
+        // apply children transforms
+        for (var n = 0; n < family.length; n++) {
+            var obj = family[n];
+
+            // Transformations are applied right to left (i.e. last transform is applied first)...
+            if (obj.x !== 0 || obj.y !== 0) {
+                transform.translate(obj.x, obj.y);
+            }
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
+            }
+            if (obj.scale.x !== 1 || obj.scale.y !== 1) {
+                transform.scale(obj.scale.x, obj.scale.y);
+            }
+            if (obj.rotation !== 0) {
+                transform.rotate(obj.rotation);
+            }
+            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
+                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
+            }
+        }
+
+        return( transform );
     }
 };
