@@ -170,6 +170,12 @@ Kinetic.Node.prototype = {
         this.visible = false;
     },
     /**
+     * Determines if it's visible
+     */
+    isVisible: function() {
+        return( this.visible );
+    },
+    /**
      * get zIndex
      */
     getZIndex: function() {

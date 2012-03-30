@@ -51,6 +51,7 @@ Kinetic.Group.prototype = {
         var children = this.getChildren(),
             childrenNum = children.length,
             childIndex,
+            childCurr,
             boundsUntransformed;
 
         if( childrenNum == 0 ) {
@@ -59,7 +60,10 @@ Kinetic.Group.prototype = {
 
         boundsUntransformed = Kinetic.BoundsRect.fromBounds( children[0].getBoundsLocal() );
         for( childIndex = 1; childIndex < childrenNum; childIndex++ ) {
-            boundsUntransformed.encloseRect( children[1].getBoundsLocal() );
+            childCurr = children[childIndex];
+            if( !childCurr.isVisible() )
+                continue;
+            boundsUntransformed.encloseRect( childCurr.getBoundsLocal() );
         }
 
         return( boundsUntransformed );

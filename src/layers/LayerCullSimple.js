@@ -40,6 +40,8 @@ Kinetic.LayerCullSimple.prototype = {
         for( childIndex = 0; childIndex < childrenNum; childIndex++ )
         {
             childCurr = children[childIndex];
+            if( !childCurr.isVisible() )
+                continue;
             if( localViewBounds.overlaps(childCurr.getBoundsLocal()) )
                 drawList.push( childCurr );
         }
