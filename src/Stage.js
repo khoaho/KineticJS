@@ -766,7 +766,9 @@ Kinetic.Stage.prototype = {
 
         viewPos = this.viewPos;
         this._viewLimits = Kinetic.BoundsRect.fromBounds( left, top, right, bottom );
-        stage.setViewPos( viewPos.x, viewPos.y );
+
+        // Force the view pos bounds limiting update...
+        this.setViewPos( viewPos.x, viewPos.y );
     }
 };
 // extend Container
