@@ -1163,4 +1163,27 @@ Test.prototype.tests = {
         layer.add(circle);
         stage.add(layer);
     },
+    'STAGE - world limit control': function(containerId) {
+        var stage = new Kinetic.Stage(containerId, 578, 200);
+        var layer = new Kinetic.Layer();
+        var rect = new Kinetic.Rect({
+            x: 100,
+            y: 100,
+            width: 100,
+            height: 50,
+            fill: 'green',
+            stroke: 'black',
+            strokeWidth: 4
+        });
+
+        layer.add(rect);
+        stage.add(layer);
+        stage.setViewLimitsByWorldBounds( new Kinetic.BoundsRect(100, 100, 578, 200) );
+        rect.transitionTo({
+            x: 500,
+            y: 30,
+            rotation: Math.PI * 2,
+            duration: 1
+        });
+    }
 };

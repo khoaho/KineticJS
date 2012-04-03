@@ -733,12 +733,12 @@ Kinetic.Node.prototype = {
         }
 
         if(stage) {
-            var stageViewPos = stage.viewPos;
+            var stageViewPos = stage.appliedViewPos;
             if( stageViewPos !== null ) {
                 transform.translate( -stageViewPos.x, -stageViewPos.y );
             }
 
-            var stageScale = stage.scale;
+            var stageScale = stage.appliedViewScale;
             if( stageScale !== null ) {
                 transform.scale(stageScale.x, stageScale.y);
             }

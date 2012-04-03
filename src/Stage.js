@@ -17,8 +17,12 @@ Kinetic.Stage = function(cont, width, height) {
     this.width = width;
     this.height = height;
 
-    this.viewPos = null;            // global view position
-    this.scale = null;              // global scale
+    this.viewPos = { x:0, y:0 };
+    this.appliedViewPos = null;
+    this.appliedViewScale = null;
+
+    this._worldLimits = null;
+    this._viewLimits = null;
 
     this.dblClickWindow = 400;
     this.clickStart = false;
@@ -91,20 +95,38 @@ Kinetic.Stage.prototype = {
      * @param {int} height
      */
     setSize: function(width, height) {
+        // set stage dimensions
+        this.width = width;
+        this.height = height;
+        this._recalcViewLimitsAndApply();
+
+        // set buffer layer and backstage layer sizes
+        this.bufferLayer.setSize( width, height );
+        this.backstageLayer.setSize( width, height );
+
         var layers = this.children;
         for(var n = 0; n < layers.length; n++) {
             var layer = layers[n];
             layer.setSize( width, height );
             layer.draw();
         }
+    },
+    /**
+     * Sets the view limits by specifying the world bounds
+     * @param {Kinetic.BoundsRect}   worldBounds    The world limits which is used to calculate the view limits
+     **/
+    setViewLimitsByWorldBounds: function(worldBounds) {
+        if( !(worldBounds instanceof Kinetic.BoundsRect) )
+        {
+            this._worldLimits = null;
+            this._viewLimits = null;
+            return;
+        }
 
-        // set stage dimensions
-        this.width = width;
-        this.height = height;
+        this._worldLimits = worldBounds;
 
-        // set buffer layer and backstage layer sizes
-        this.bufferLayer.setSize( width, height );
-        this.backstageLayer.setSize( width, height );
+        // Translate the limits from world space to view space and apply it
+        this._recalcViewLimitsAndApply();
     },
     /**
      * set view position
@@ -112,29 +134,37 @@ Kinetic.Stage.prototype = {
      * @param {int} y
      */
     setViewPos: function(x, y) {
-        if( x === 0 && y === 0 )
-        {
-            this.viewPos = null;
+        // Store the configured view position...
+        this.viewPos = { x: x, y:y };
+
+        var viewLimits = this._viewLimits;
+        if( viewLimits !== null ) {
+            x = Math.min( viewLimits.getRight(), Math.max(viewLimits.getLeft(), x) );
+            y = Math.min( viewLimits.getBottom(), Math.max(viewLimits.getTop(), y) );
+        }
+
+        if( x === 0 && y === 0 ) {
+            this.appliedViewPos = null;
             return;
         }
 
-        if( this.viewPos === null )
-        {
-            this.viewPos = { x: x, y: y };
-            return;
-        }
-
-        this.viewPos.x = x;
-        this.viewPos.y = y;
+        this.appliedViewPos = { x: x, y: y };
     },
     /**
      * get view position
      */
     getViewPos: function() {
-        if( this.viewPos === null )
-            return( {x:0,  y:0} );
-
         return this.viewPos;
+    },
+    /**
+     * get view position
+     */
+    getViewPosLimited: function() {
+        if( this.appliedViewPos !== null ) {
+            return( this.appliedViewPos );
+        }
+
+        return( this.viewPos );
     },
     /**
      * set stage scale.  If only one parameter is passed in, then
@@ -148,27 +178,21 @@ Kinetic.Stage.prototype = {
 
         if( scaleX === 1 && scaleY === 1 )
         {
-            this.scale = null;
+            this.appliedViewScale = null;
             return;
         }
 
-        if( this.scale === null )
-        {
-            this.scale = { x:scaleX, y:scaleY };
-            return;
-        }
-
-        this.scale.x = scaleX;
-        this.scale.y = scaleY;
+        this.appliedViewScale = { x:scaleX, y:scaleY };
+        this._recalcViewLimitsAndApply();
     },
     /**
      * get scale
      */
     getScale: function() {
-        if( this.scale === null )
+        if( this.appliedViewScale === null )
             return( {x:1, y:1} );
 
-        return this.scale;
+        return this.appliedViewScale;
     },
     /**
      * clear all layers
@@ -489,7 +513,6 @@ Kinetic.Stage.prototype = {
         if(!shapeDetected && this.mouseoutShape) {
             this.mouseoutShape._handleEvents('onmouseout', evt);
             this.mouseoutShape = undefined;
-
         }
     },
     /**
@@ -699,6 +722,43 @@ Kinetic.Stage.prototype = {
         // add backstage layer
         this.backstageLayer.setSize( this.width, this.height );
         this.content.appendChild(this.backstageLayer.canvas);
+    },
+    /**
+     Recalculate the view limits based on world limits and apply it
+     **/
+    _recalcViewLimitsAndApply: function()
+    {
+        var worldLimits = this._worldLimits,
+            stageScale,
+            left, top, right, bottom,
+            viewPos;
+
+        // No world limits to apply? We're done...
+        if( worldLimits === null )
+            return;
+
+        // Transform the world limits to view limits
+        stageScale = this.getScale();
+        left = worldLimits.getLeft();
+        top = worldLimits.getTop();
+        right = (worldLimits.getRight() * stageScale.x) - this.width;
+        bottom = (worldLimits.getBottom() * stageScale.y) - this.height;
+
+        // The limits is smaller than the view space horizontally? The limits are kept in the center of the viewport...
+        if( right < left )
+        {
+            left = Math.round( (right + left) * 0.5 );
+            right = left;
+        }
+        if( bottom < top )
+        {
+            top = Math.round( (top + bottom) * 0.5 );
+            bottom = top;
+        }
+
+        viewPos = this.viewPos;
+        this._viewLimits = APP.Rect.fromBounds( left, top, right, bottom );
+        stage.setViewPos( viewPos.x, viewPos.y );
     }
 };
 // extend Container
