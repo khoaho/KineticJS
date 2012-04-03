@@ -157,16 +157,6 @@ Kinetic.Stage.prototype = {
         return this.viewPos;
     },
     /**
-     * get view position
-     */
-    getViewPosLimited: function() {
-        if( this.appliedViewPos !== null ) {
-            return( this.appliedViewPos );
-        }
-
-        return( this.viewPos );
-    },
-    /**
      * set stage scale.  If only one parameter is passed in, then
      * both scaleX and scaleY are set to the parameter
      * @param {int} scaleX
@@ -757,7 +747,7 @@ Kinetic.Stage.prototype = {
         }
 
         viewPos = this.viewPos;
-        this._viewLimits = APP.Rect.fromBounds( left, top, right, bottom );
+        this._viewLimits = Kinetic.BoundsRect.fromBounds( left, top, right, bottom );
         stage.setViewPos( viewPos.x, viewPos.y );
     }
 };
