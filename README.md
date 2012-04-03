@@ -14,6 +14,7 @@ This project is licensed under the MIT license and/or GPL v2 license.
 ## Contributors
 - Eric Rowell and Antoine Proulx for the original KineticJS GitHub source (http://www.kineticjs.com/)
 - Simon Sarris for a substantial part of the Kinetic.Transform source code (www.simonsarris.com)
+- Yusuf Sasak for the functionality to override default mouse detection methods
 - Chris Khoo ([Wappworks Studio](http://www.wappworks.com))
 
 ## Build environment
