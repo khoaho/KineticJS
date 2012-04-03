@@ -46,6 +46,7 @@ Kinetic.Stage = function(cont, width, height) {
 
     // animation support
     this.isAnimating = false;
+    this.redraw = false;
     this.onFrameFunc = undefined;
 
     this._buildDOM();
@@ -84,9 +85,26 @@ Kinetic.Stage.prototype = {
         Kinetic.GlobalObject._handleAnimation();
     },
     /**
+     * mark for redraw
+     */
+    markForRedraw: function() {
+        if( this.redraw === true )
+            return;
+
+        this.redraw = true;
+        Kinetic.GlobalObject._handleAnimation();
+    },
+    /**
+     * determines if the layer needs to be redrawn
+     */
+    needsRedraw: function() {
+        return( this.redraw );
+    },
+    /**
      * draw children
      */
     draw: function() {
+        this.redraw = false;
         this._drawChildren();
     },
     /**

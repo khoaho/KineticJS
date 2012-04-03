@@ -45,6 +45,8 @@ Kinetic.GlobalObject = {
     _isaCanvasAnimating: function() {
         for(var n = 0; n < this.stages.length; n++) {
             var stage = this.stages[n];
+            if( stage.needsRedraw() )
+                return true;
             if(stage.isAnimating) {
                 return true;
             }
@@ -165,6 +167,8 @@ Kinetic.GlobalObject = {
     _runFrames: function() {
         for(var n = 0; n < this.stages.length; n++) {
             var stage = this.stages[n];
+            var stageNeedsRedraw = stage.needsRedraw();
+
             // run animation if available
             if(stage.isAnimating && stage.onFrameFunc !== undefined) {
                 stage.onFrameFunc(this.frame);
@@ -173,6 +177,8 @@ Kinetic.GlobalObject = {
             // loop through layers
             var layers = stage.getChildren();
             for(var k = 0; k < layers.length; k++) {
+
+                // Update the layer transitions
                 var layer = layers[k];
                 var didTransition = false;
                 // loop through transitions
@@ -192,9 +198,20 @@ Kinetic.GlobalObject = {
                     }
                 }
 
+                // If we're doing a stage redraw, no need to draw per layer...
+                if( stageNeedsRedraw ) {
+                    continue;
+                }
+
+                // Draw the layer individually if it's changed...
                 if( didTransition||layer.needsRedraw() ) {
                     layer.draw();
                 }
+            }
+
+            // If the stage needs to be redrawn, do it here...
+            if( stageNeedsRedraw ) {
+                stage.draw();
             }
         }
     },
