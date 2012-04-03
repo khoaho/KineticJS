@@ -134,6 +134,14 @@ Kinetic.Shape.prototype = {
         return this.compositeMode;
     },
     /**
+     * mark for redraw
+     */
+    markForRedraw: function() {
+        var layer = this.getLayer();
+        if( layer !== null )
+            layer.markForRedraw();
+    },
+    /**
      * get the local transform
      * @returns {Kinetic.Transform}
      */

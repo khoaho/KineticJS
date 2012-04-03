@@ -14,6 +14,8 @@ Kinetic.GlobalObject = {
     stages: [],
     idCounter: 0,
     tempCanvas: null,
+    isLoopActive: false,
+    frameUpdateMs: 1000/ 60,
     frame: {
         time: 0,
         timeDiff: 0,
@@ -34,6 +36,12 @@ Kinetic.GlobalObject = {
             }
         }
     },
+    setFrameRate: function( updateHz ) {
+        this.frameUpdateMs = 1000 / updateHz;
+    },
+    setFrameUpdateMs: function( updateMs ) {
+        this.frameUpdateMs = updateMs;
+    },
     _isaCanvasAnimating: function() {
         for(var n = 0; n < this.stages.length; n++) {
             var stage = this.stages[n];
@@ -43,6 +51,8 @@ Kinetic.GlobalObject = {
 
             for(var i = 0; i < stage.children.length; i++) {
                 var layer = stage.children[i];
+                if( layer.needsRedraw() )
+                    return true;
                 if(layer.transitions.length > 0) {
                     return true;
                 }
@@ -182,7 +192,7 @@ Kinetic.GlobalObject = {
                     }
                 }
 
-                if(didTransition) {
+                if( didTransition||layer.needsRedraw() ) {
                     layer.draw();
                 }
             }
@@ -208,13 +218,20 @@ Kinetic.GlobalObject = {
             requestAnimFrame(function() {
                 that._animationLoop();
             });
+
+            return;
         }
+
+        this.isLoopActive = false;
     },
     _handleAnimation: function() {
+        if( this.isLoopActive )
+            return;
+
         var that = this;
-        if(this._isaCanvasAnimating()) {
+        requestAnimFrame(function() {
             that._animationLoop();
-        }
+        });
     },
     getTempCanvasContext: function() {
         if( this.tempCanvas == null )
@@ -227,6 +244,6 @@ Kinetic.GlobalObject = {
 window.requestAnimFrame = (function() {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
     function(callback) {
-        window.setTimeout(callback, 1000 / 60);
+        window.setTimeout(callback, Kinetic.GlobalObject.frameUpdateMs);
     };
 })();

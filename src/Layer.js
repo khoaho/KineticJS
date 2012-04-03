@@ -16,6 +16,7 @@ Kinetic.Layer = function(config) {
     this.canvas.style.position = 'absolute';
     this.transitions = [];
     this.transitionIdCounter = 0;
+    this.redraw = false;
 
     // call super constructors
     Kinetic.Container.apply(this, []);
@@ -79,9 +80,26 @@ Kinetic.Layer.prototype = {
         this.invalidateBoundsLocal();
     },
     /**
+     * mark for redraw
+     */
+    markForRedraw: function() {
+        if( this.redraw === true )
+            return;
+
+        this.redraw = true;
+        Kinetic.GlobalObject._handleAnimation();
+    },
+    /**
+     * determines if the layer needs to be redrawn
+     */
+    needsRedraw: function() {
+        return( this.redraw );
+    },
+    /**
      * private draw children
      */
     _draw: function() {
+        this.redraw = false;
         this.clear();
         if(this.visible) {
             this._drawChildren();
