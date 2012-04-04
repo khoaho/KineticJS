@@ -24,10 +24,7 @@ Kinetic.GlobalObject = {
     drag: {
         moving: false,
         node: undefined,
-        offset: {
-            x: 0,
-            y: 0
-        }
+        custom: undefined
     },
     extend: function(obj1, obj2) {
         for(var key in obj2.prototype) {

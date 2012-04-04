@@ -686,8 +686,11 @@ Kinetic.Stage.prototype = {
                 go.drag.moving = false;
                 go.drag.node._handleEvents('ondragend', evt);
             }
+
+            go.drag.node.onDragStop();
         }
         go.drag.node = undefined;
+        go.drag.custom = undefined;
     },
     /**
      * prepare drag and drop
@@ -700,21 +703,7 @@ Kinetic.Stage.prototype = {
             var node = go.drag.node;
             if(node) {
                 var pos = that.getUserPosition();
-                var ds = node.dragConstraint;
-                var db = node.dragBounds;
-                if(ds === 'none' || ds === 'horizontal') {
-                    var newX = pos.x - go.drag.offset.x;
-                    if((db.left === undefined || db.left < newX) && (db.right === undefined || db.right > newX)) {
-                        node.x = newX;
-                    }
-                }
-                if(ds === 'none' || ds === 'vertical') {
-                    var newY = pos.y - go.drag.offset.y;
-                    if((db.top === undefined || db.top < newY) && (db.bottom === undefined || db.bottom > newY)) {
-                        node.y = newY;
-                    }
-                }
-                go.drag.node.markForRedraw();
+                node.onDragUpdate( pos, go.drag.node.custom );
 
                 if(!go.drag.moving) {
                     go.drag.moving = true;

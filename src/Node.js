@@ -652,6 +652,47 @@ Kinetic.Node.prototype = {
         return this.dragBounds;
     },
     /**
+     * called when dragging starts
+     * @param {Object} dragPos
+     * @param {Object} customObj
+     *
+     * @dragPos {Number} x
+     * @dragPos {Number} y
+     */
+    onDragStart: function( dragPos, customObj ) {
+        customObj.offset = { x:dragPos.x - this.x, y:dragPos.y - this.y }
+    },
+    /**
+     * called when there is a drag update
+     * @param {Object} dragPos
+     * @param {Object} customObj
+     *
+     * @dragPos {Number} x
+     * @dragPos {Number} y
+     */
+    onDragUpdate: function( dragPos, customObj ) {
+        var ds = this.dragConstraint;
+        var db = this.dragBounds;
+        if(ds === 'none' || ds === 'horizontal') {
+            var newX = dragPos.x - customObj.offset.x;
+            if((db.left === undefined || db.left < newX) && (db.right === undefined || db.right > newX)) {
+                this.x = newX;
+            }
+        }
+        if(ds === 'none' || ds === 'vertical') {
+            var newY = dragPos.y - customObj.offset.y;
+            if((db.top === undefined || db.top < newY) && (db.bottom === undefined || db.bottom > newY)) {
+                this.y = newY;
+            }
+        }
+        this.markForRedraw();
+    },
+    /**
+     * called when the dragging stops
+     */
+    onDragStop: function() {
+    },
+    /**
      * initialize drag and drop
      */
     _initDrag: function() {
@@ -663,8 +704,8 @@ Kinetic.Node.prototype = {
 
             if(pos) {
                 go.drag.node = that;
-                go.drag.offset.x = pos.x - that.x;
-                go.drag.offset.y = pos.y - that.y;
+                go.drag.custom = {};
+                that.onDragStart( pos, go.drag.custom );
             }
         });
     },
