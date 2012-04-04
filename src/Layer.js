@@ -52,6 +52,17 @@ Kinetic.Layer.prototype = {
         this.invalidateBoundsLocal();
     },
     /**
+     * gets the layer size
+     * @returns {Object} size
+     *
+     * @size {Number} x
+     * @size {Number} y
+     */
+    getSize: function() {
+        var canvas = this.getCanvas();
+        return( { x:canvas.width, y:canvas.height } );
+    },
+    /**
      * get layer canvas
      */
     getCanvas: function() {
@@ -113,7 +124,7 @@ Kinetic.Layer.prototype = {
     {
         // The bounds for this node is the canvas bounds...
         var canvas = this.getCanvas();
-        return( Kinetic.BoundsRect(0, 0, canvas.width, canvas.height) );
+        return( new Kinetic.BoundsRect(0, 0, canvas.width, canvas.height) );
     }
 };
 // Extend Container and Node

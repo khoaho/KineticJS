@@ -512,9 +512,14 @@ Kinetic.Node.prototype = {
     getLayer: function() {
         if(this.className === 'Layer') {
             return this;
-        } else {
-            return this.getParent().getLayer();
         }
+
+        var parent = this.getParent();
+        if( parent != null ) {
+            return parent.getLayer();
+        }
+
+        return undefined;
     },
     /**
      * get stage associated to node
@@ -551,6 +556,14 @@ Kinetic.Node.prototype = {
      */
     getCenterOffset: function() {
         return this.centerOffset;
+    },
+    /**
+     * mark for redraw
+     */
+    markForRedraw: function() {
+        var layer = this.getLayer();
+        if( layer != null )
+            layer.markForRedraw();
     },
     /**
      * transition node to another state.  Any property that can accept a real

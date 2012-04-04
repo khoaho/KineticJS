@@ -134,40 +134,6 @@ Kinetic.Shape.prototype = {
         return this.compositeMode;
     },
     /**
-     * mark for redraw
-     */
-    markForRedraw: function() {
-        var layer = this.getLayer();
-        if( layer !== null )
-            layer.markForRedraw();
-    },
-    /**
-     * get the local transform
-     * @returns {Kinetic.Transform}
-     */
-    getBoundsLocal: function()
-    {
-        var transform = new Kinetic.Transform();
-        // Transformations are applied right to left (i.e. last transform is applied first)...
-        if (this.x !== 0 || this.y !== 0) {
-            transform.translate(this.x, this.y);
-        }
-        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
-            transform.translate(this.centerOffset.x, this.centerOffset.y);
-        }
-        if (this.scale.x !== 1 || this.scale.y !== 1) {
-            transform.scale(this.scale.x, this.scale.y);
-        }
-        if (this.rotation !== 0) {
-            transform.rotate(this.rotation);
-        }
-        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
-            transform.translate(-1 * this.centerOffset.x, -1 * this.centerOffset.y);
-        }
-
-        return( transform );
-    },
-    /**
      * draw shape
      * @param {Kinetic.Layer} layer Layer that the shape will be drawn on
      * @param {Boolean} isForDetection  True if the draw is for point detection

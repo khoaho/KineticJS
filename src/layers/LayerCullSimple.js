@@ -46,7 +46,7 @@ Kinetic.LayerCullSimple.prototype = {
                 drawList.push( childCurr );
         }
 
-        return( childCurr );
+        return( drawList );
     }
 };
 // Extend Layer

@@ -55,7 +55,7 @@ Kinetic.Group.prototype = {
             boundsUntransformed;
 
         if( childrenNum == 0 ) {
-            return( Kinetic.BoundsRect(0, 0, 0 , 0) );
+            return( new Kinetic.BoundsRect(0, 0, 0 , 0) );
         }
 
         boundsUntransformed = Kinetic.BoundsRect.fromBounds( children[0].getBoundsLocal() );

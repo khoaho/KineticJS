@@ -52,7 +52,7 @@ Kinetic.Polygon.prototype = {
             boundsUntransformed;
 
         if( pointsNum == 0 ) {
-            return( Kinetic.BoundsRect(0, 0, 0, 0) );
+            return( new Kinetic.BoundsRect(0, 0, 0, 0) );
         }
 
         pointCurr = points[0];

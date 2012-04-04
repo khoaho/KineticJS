@@ -63,6 +63,8 @@ p.multiply = function(matrix) {
   this.m[3] = m22;
   this.m[4] = dx;
   this.m[5] = dy;
+
+  return this;
 };
 
 /**
@@ -82,6 +84,8 @@ p.invert = function() {
   this.m[3] = m3;
   this.m[4] = m4;
   this.m[5] = m5;
+
+  return this;
 };
 
 /**
@@ -99,6 +103,7 @@ p.rotate = function(rad) {
   this.m[1] = m12;
   this.m[2] = m21;
   this.m[3] = m22;
+  return this;
 };
 
 /**
@@ -109,6 +114,8 @@ p.rotate = function(rad) {
 p.translate = function(x, y) {
   this.m[4] += this.m[0] * x + this.m[2] * y;
   this.m[5] += this.m[1] * x + this.m[3] * y;
+
+  return this;
 };
 
 /**
@@ -121,6 +128,8 @@ p.scale = function(sx, sy) {
   this.m[1] *= sx;
   this.m[2] *= sy;
   this.m[3] *= sy;
+
+  return this;
 };
 
 /**

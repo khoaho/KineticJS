@@ -64,6 +64,15 @@ Kinetic.Stage = function(cont, width, height) {
  */
 Kinetic.Stage.prototype = {
     /**
+     * destroys the stage
+     *
+     */
+    destroy: function() {
+        var goIndex = Kinetic.GlobalObject.stages.indexOf(this);
+        if( goIndex >= 0 )
+            Kinetic.GlobalObject.stages.splice( goIndex, 1 );
+    },
+    /**
      * sets onFrameFunc for animation
      * @param {function} func
      */
@@ -118,6 +127,9 @@ Kinetic.Stage.prototype = {
         this.height = height;
         this._recalcViewLimitsAndApply();
 
+        this.content.style.width = width + 'px';
+        this.content.style.height = height + 'px';
+
         // set buffer layer and backstage layer sizes
         this.bufferLayer.setSize( width, height );
         this.backstageLayer.setSize( width, height );
@@ -126,8 +138,19 @@ Kinetic.Stage.prototype = {
         for(var n = 0; n < layers.length; n++) {
             var layer = layers[n];
             layer.setSize( width, height );
-            layer.draw();
         }
+
+        this.markForRedraw();
+    },
+    /**
+     * gets the layer size
+     * @returns {Object} size
+     *
+     * @size {Number} x
+     * @size {Number} y
+     */
+    getSize: function() {
+        return( { x:this.width, y:this.height } );
     },
     /**
      * Sets the view limits by specifying the world bounds
@@ -147,11 +170,11 @@ Kinetic.Stage.prototype = {
         this._recalcViewLimitsAndApply();
     },
     /**
-     * set view position
+     * set the view position
      * @param {int} x
      * @param {int} y
      */
-    setViewPos: function(x, y) {
+    setTargetViewPos: function(x, y) {
         // Store the configured view position...
         this.viewPos = { x: x, y:y };
 
@@ -169,10 +192,19 @@ Kinetic.Stage.prototype = {
         this.appliedViewPos = { x: x, y: y };
     },
     /**
-     * get view position
+     * get the target view position
+     */
+    getTargetViewPos: function() {
+        return this.viewPos;
+    },
+    /**
+     * get the view position
      */
     getViewPos: function() {
-        return this.viewPos;
+        if( this.appliedViewPos !== null )
+            return( this.appliedViewPos );
+
+        return( this.viewPos );
     },
     /**
      * set stage scale.  If only one parameter is passed in, then
@@ -274,8 +306,8 @@ Kinetic.Stage.prototype = {
         this._add(layer);
 
         // draw layer and append canvas to container
-        layer.draw();
         this.content.appendChild(layer.canvas);
+        layer.markForRedraw();
     },
     /**
      * get mouse position for desktop apps
@@ -682,7 +714,7 @@ Kinetic.Stage.prototype = {
                         node.y = newY;
                     }
                 }
-                go.drag.node.getLayer().draw();
+                go.drag.node.markForRedraw();
 
                 if(!go.drag.moving) {
                     go.drag.moving = true;
@@ -705,7 +737,7 @@ Kinetic.Stage.prototype = {
         // content
         this.content.style.width = this.width + 'px';
         this.content.style.height = this.height + 'px';
-        this.content.style.position = 'relative';
+        this.content.style.position = 'absolute';
         this.content.style.display = 'inline-block';
         this.content.className = 'kineticjs-content';
         this.container.appendChild(this.content);
@@ -768,7 +800,7 @@ Kinetic.Stage.prototype = {
         this._viewLimits = Kinetic.BoundsRect.fromBounds( left, top, right, bottom );
 
         // Force the view pos bounds limiting update...
-        this.setViewPos( viewPos.x, viewPos.y );
+        this.setTargetViewPos( viewPos.x, viewPos.y );
     }
 };
 // extend Container

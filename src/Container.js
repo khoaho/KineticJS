@@ -52,6 +52,7 @@ Kinetic.Container.prototype = {
         if(child.name !== undefined) {
             this.childrenNames[child.name] = undefined;
         }
+        child.parent = undefined;
         this.children.splice(child.index, 1);
         this._setChildrenIndices();
     },

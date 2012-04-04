@@ -31,22 +31,22 @@ Kinetic.BoundsRect = function( x, y, width, height )
  @param {Number} top
  @param {Number} right
  @param {Number} bottom
- @returns {Kinetic.Rect}
+ @returns {Kinetic.BoundsRect}
  */
 Kinetic.BoundsRect.fromBounds = function( left, top, right, bottom )
 {
-    return( new Kinetic.Rect(left, top, right-left, bottom-top) );
+    return( new Kinetic.BoundsRect(left, top, right-left, bottom-top) );
 };
 
 /*
  Creates a rect object from point provided
  @param {Number} x
  @param {Number} y
- @returns {Kinetic.Rect}
+ @returns {Kinetic.BoundsRect}
  */
 Kinetic.BoundsRect.fromPoint = function( x, y )
 {
-    return( new Kinetic.Rect(x, y, 0, 0) );
+    return( new Kinetic.BoundsRect(x, y, 0, 0) );
 };
 
 Kinetic.BoundsRect.prototype = {
@@ -89,7 +89,7 @@ Kinetic.BoundsRect.prototype = {
     
     /*
      Determines if there's an overlap
-     @param {Kinetic.Rect} rect
+     @param {Kinetic.BoundsRect} rect
      @returns {Boolean}  True if it overlaps
      */
     overlaps: function( rect )
@@ -105,8 +105,8 @@ Kinetic.BoundsRect.prototype = {
     
     /*
      Encloses the target rect
-     @param      {Kinetic.Rect}   rect
-     @returns    {Kinetic.Rect}  the current instance
+     @param      {Kinetic.BoundsRect}   rect
+     @returns    {Kinetic.BoundsRect}  the current instance
      */
     encloseRect: function( rect )
     {
@@ -125,7 +125,7 @@ Kinetic.BoundsRect.prototype = {
      Encloses the target point
      @param      {Number}   x
      @param      {Number}   y
-     @returns    {Kinetic.Rect}  the current instance
+     @returns    {Kinetic.BoundsRect}  the current instance
      */
     enclosePoint: function( x, y )
     {
@@ -142,7 +142,7 @@ Kinetic.BoundsRect.prototype = {
 
     /*
     Determines if the rects are equal
-    @param {Kinetic.Rect} rect
+    @param {Kinetic.BoundsRect} rect
     @returns {Boolean}  True if it's equal
     */
     isEqual: function( rect )
@@ -153,7 +153,7 @@ Kinetic.BoundsRect.prototype = {
     /*
      Applies the transformation to a node bounds
      @param     {Kinetic.Transform} transform
-     @returns   {Kinetic.Rect}  the current instance with transformation applied
+     @returns   {Kinetic.BoundsRect}  the current instance with transformation applied
      */
     transform: function( transform )
     {
@@ -162,11 +162,9 @@ Kinetic.BoundsRect.prototype = {
             this.width *= transform.m[0];
             this.height *= transform.m[3];
 
-            if( this.x != 0 || this.y != 0 ) {
-                var boundsTopLeft = transform.transformPoint( this.x, this.y );
-                this.x = boundsTopLeft.x;
-                this.y = boundsTopLeft.y;
-            }
+            var boundsTopLeft = transform.transformPoint( this.x, this.y );
+            this.x = boundsTopLeft.x;
+            this.y = boundsTopLeft.y;
 
             return( this );
         }
@@ -196,10 +194,10 @@ Kinetic.BoundsRect.prototype = {
 
     /*
      Clones the current rect
-     @returns    {Kinetic.Rect}  new instance of a rect..
+     @returns    {Kinetic.BoundsRect}  new instance of a rect..
      */
     clone: function()
     {
-        return( new Kinetic.Rect(this.x, this.y, this.width, this.height) );
+        return( new Kinetic.BoundsRect(this.x, this.y, this.width, this.height) );
     }
 };
