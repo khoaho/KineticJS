@@ -660,7 +660,7 @@ Kinetic.Node.prototype = {
      * @dragPos {Number} y
      */
     onDragStart: function( dragPos, customObj ) {
-        customObj.offset = { x:dragPos.x - this.x, y:dragPos.y - this.y }
+        customObj.offset = { x:dragPos.x - this.x, y:dragPos.y - this.y };
     },
     /**
      * called when there is a drag update

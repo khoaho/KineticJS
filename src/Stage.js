@@ -703,7 +703,7 @@ Kinetic.Stage.prototype = {
             var node = go.drag.node;
             if(node) {
                 var pos = that.getUserPosition();
-                node.onDragUpdate( pos, go.drag.node.custom );
+                node.onDragUpdate( pos, go.drag.custom );
 
                 if(!go.drag.moving) {
                     go.drag.moving = true;
