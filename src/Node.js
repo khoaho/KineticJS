@@ -29,7 +29,6 @@ Kinetic.Node = function(config) {
     this.dragBounds = {};
     this._draggable = false;
     this._boundsNoTranslation = null;
-    this._boundsUntransformed = null;
 
     // set properties from config
     if(config) {
@@ -806,9 +805,6 @@ Kinetic.Node.prototype = {
             if (obj.x !== 0 || obj.y !== 0) {
                 transform.translate(obj.x, obj.y);
             }
-            if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(obj.centerOffset.x, obj.centerOffset.y);
-            }
             if (obj.scale.x !== 1 || obj.scale.y !== 1) {
                 transform.scale(obj.scale.x, obj.scale.y);
             }
@@ -816,7 +812,7 @@ Kinetic.Node.prototype = {
                 transform.rotate(obj.rotation);
             }
             if (obj.centerOffset.x !== 0 || obj.centerOffset.y !== 0) {
-                transform.translate(-1 * obj.centerOffset.x, -1 * obj.centerOffset.y);
+                transform.translate(-obj.centerOffset.x, -obj.centerOffset.y);
             }
         }
 
