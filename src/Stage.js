@@ -709,7 +709,7 @@ Kinetic.Stage.prototype = {
 
                     // execute drag start
                     go.drag.custom = {};
-                    that.onDragStart( go.drag.userPosStart, go.drag.custom );
+                    go.drag.node.onDragStart( go.drag.userPosStart, go.drag.custom );
                     go.drag.node._handleEvents('ondragstart', go.drag.inputStartEvent);
                 }
 
