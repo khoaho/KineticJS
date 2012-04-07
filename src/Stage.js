@@ -690,6 +690,8 @@ Kinetic.Stage.prototype = {
             go.drag.node.onDragStop();
         }
         go.drag.node = undefined;
+        go.drag.inputStartEvent = undefined;
+        go.drag.userPosStart = undefined;
         go.drag.custom = undefined;
     },
     /**
@@ -702,15 +704,18 @@ Kinetic.Stage.prototype = {
             var go = Kinetic.GlobalObject;
             var node = go.drag.node;
             if(node) {
-                var pos = that.getUserPosition();
-                node.onDragUpdate( pos, go.drag.custom );
-
                 if(!go.drag.moving) {
                     go.drag.moving = true;
-                    // execute dragstart events if defined
-                    go.drag.node._handleEvents('ondragstart', evt);
+
+                    // execute drag start
+                    go.drag.custom = {};
+                    that.onDragStart( go.drag.userPosStart, go.drag.custom );
+                    go.drag.node._handleEvents('ondragstart', go.drag.inputStartEvent);
                 }
-                // execute user defined ondragmove if defined
+
+                // execute drag move
+                var pos = that.getUserPosition();
+                node.onDragUpdate( pos, go.drag.custom );
                 go.drag.node._handleEvents('ondragmove', evt);
             }
         }, false);

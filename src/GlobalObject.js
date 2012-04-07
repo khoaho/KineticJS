@@ -23,6 +23,8 @@ Kinetic.GlobalObject = {
     },
     drag: {
         moving: false,
+        inputStartEvent: undefined,
+        userPosStart: undefined,
         node: undefined,
         custom: undefined
     },

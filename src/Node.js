@@ -753,8 +753,8 @@ Kinetic.Node.prototype = {
 
             if(pos) {
                 go.drag.node = that;
-                go.drag.custom = {};
-                that.onDragStart( pos, go.drag.custom );
+                go.drag.inputStartEvent = evt;
+                go.drag.userPosStart = pos;
             }
         });
     },
