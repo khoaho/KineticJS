@@ -313,9 +313,6 @@ Kinetic.Node.prototype = {
         if (this.x !== 0 || this.y !== 0) {
             transform.translate(this.x, this.y);
         }
-        if (this.centerOffset.x !== 0 || this.centerOffset.y !== 0) {
-            transform.translate(this.centerOffset.x, this.centerOffset.y);
-        }
         if (this.scale.x !== 1 || this.scale.y !== 1) {
             transform.scale(this.scale.x, this.scale.y);
         }
