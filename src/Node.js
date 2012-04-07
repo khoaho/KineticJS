@@ -343,6 +343,8 @@ Kinetic.Node.prototype = {
             this.x = prevX;
             this.y = prevY;
 
+            // Optimization - the local bounds includes all aspects of the transformation except for the translation
+            // under the assumption that translating will be the most common operation...
             this._boundsNoTranslation = this._getNodeBoundsUntransformed().transform( transform );
         }
 
