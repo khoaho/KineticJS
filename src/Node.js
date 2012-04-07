@@ -553,6 +553,54 @@ Kinetic.Node.prototype = {
         this._boundsNoTranslation = null;
     },
     /**
+     * set center offset by alignment
+     * @param {String}  hAlign      Horiontal alignment to use for the center offset calculation (left,right,center).
+     *                              Use null to ignore.
+     * @param {String}  vAlign      Vertical alignment to use for the center offset calculation (top, bottom, middle).
+     *                              Use null to ignore.
+     */
+    setCenterOffsetByAlign: function(hAlign, vAlign) {
+        var localBounds = this._getNodeBoundsUntransformed();
+
+        switch( hAlign )
+        {
+            case "left":
+                this.centerOffset.x = localBounds.x;
+                break;
+
+            case "right":
+                this.centerOffset.x = localBounds.getRight();
+                break;
+
+            case "center":
+                this.centerOffset.x = localBounds.x + (localBounds.width * 0.5);
+                break;
+
+            default:
+                break;
+        }
+
+        switch( vAlign )
+        {
+            case "top":
+                this.centerOffset.y = localBounds.y;
+                break;
+
+            case "bottom":
+                this.centerOffset.y = localBounds.getBottom();
+                break;
+
+            case "center":
+                this.centerOffset.y = localBounds.y + (localBounds.height * 0.5);
+                break;
+
+            default:
+                break;
+        }
+
+        this._boundsNoTranslation = null;
+    },
+    /**
      * get center offset
      */
     getCenterOffset: function() {
