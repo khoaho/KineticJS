@@ -58,7 +58,7 @@ Kinetic.Group.prototype = {
             return( new Kinetic.BoundsRect(0, 0, 0 , 0) );
         }
 
-        boundsUntransformed = Kinetic.BoundsRect.fromBounds( children[0].getBoundsLocal() );
+        boundsUntransformed = children[0].getBoundsLocal();
         for( childIndex = 1; childIndex < childrenNum; childIndex++ ) {
             childCurr = children[childIndex];
             if( !childCurr.isVisible() )
