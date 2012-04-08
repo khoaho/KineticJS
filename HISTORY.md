@@ -1,14 +1,16 @@
-# v3.8.2.1
+# KineticJs Extended Version History
+
+## v3.8.2.1
 - Branched from original kineticjs v3.8.2.1
 
-## New Features
+### New Features
 - Added matrix transform class
 - Added functionality to retrieve a node's transform
 
-# v3.8.2.2
-## New Features:
+## v3.8.2.2
+### New Features:
 - Added the ability to mark node for redrawing which triggers an automatic draw
-- Added the ability to override the draw sorting algorithm to all Kinetic.Containers
+- Added the ability to extend/override the default draw sort order behavior to all Kinetic.Containers
   (Kinetic.Container::setDrawSortFunction())
 - Added a Layer with simple shape culling functionality for large world rendering (Kinetic.LayerCullSimple)
 - Added the ability to limit the stage view bounds by specifying a world bounds
