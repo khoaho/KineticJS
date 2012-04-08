@@ -1,7 +1,7 @@
 # KineticJs Extended Version History
 
 ## v3.8.2.1
-- Branched from original kineticjs v3.8.2.1
+Branched from Eric Rowell's KineticJs library (v3.8.2)
 
 ### New Features
 - Added matrix transform class
