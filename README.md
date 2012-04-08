@@ -1,7 +1,7 @@
 # KineticJs Extended (kinetic-ext) Javascript Library
 KineticJs Extended "extends" KineticJs, an HTML5 Canvas JavaScript library.
 
-Key Features:
+## Key Features
 - Layer scene culling support
 - Custom draw sort control
 - Automated redraws when node's are marked for redraw
