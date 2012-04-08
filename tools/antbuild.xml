@@ -10,7 +10,7 @@
 	
 	<property environment="env"/>
 	<property name="libname" value="kinetic-ext"/>
-	<property name="libversion" value="v3.8.2.1"/>
+	<property name="libversion" value="v3.8.2.2"/>
 	<property name="kineticjs-version" value="v3.8.2"/>
 	<property name="tools.root" value="."/>
 	
