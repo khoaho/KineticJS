@@ -1,8 +1,13 @@
 # KineticJs Extended (kinetic-ext) Javascript Library
-KineticJs Extended "extends" KineticJs, an HTML5 Canvas JavaScript library. Additional features:
+KineticJs Extended "extends" KineticJs, an HTML5 Canvas JavaScript library.
 
-- Adds a matrix transform class
-- Ability to get a shape's transform matrix (Kinetic.Shape.getTransform())
+Key Features:
+- Layer scene culling support
+- Custom draw sort control
+- Automated redraws when node's are marked for redraw
+- Node transform retrieval capability
+- Overridable drag behavior
+- Stage view bounds limiting
 
 
 ## Attribution
