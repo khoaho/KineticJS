@@ -8,8 +8,7 @@
  @param {Number} [width]
  @param {Number} [height]
  */
-Kinetic.BoundsRect = function( x, y, width, height )
-{
+Kinetic.BoundsRect = function( x, y, width, height ) {
     if( x === undefined )
         x = 0;
     if( y === undefined )
@@ -33,8 +32,7 @@ Kinetic.BoundsRect = function( x, y, width, height )
  @param {Number} bottom
  @returns {Kinetic.BoundsRect}
  */
-Kinetic.BoundsRect.fromBounds = function( left, top, right, bottom )
-{
+Kinetic.BoundsRect.fromBounds = function( left, top, right, bottom ) {
     return( new Kinetic.BoundsRect(left, top, right-left, bottom-top) );
 };
 
@@ -44,8 +42,7 @@ Kinetic.BoundsRect.fromBounds = function( left, top, right, bottom )
  @param {Number} y
  @returns {Kinetic.BoundsRect}
  */
-Kinetic.BoundsRect.fromPoint = function( x, y )
-{
+Kinetic.BoundsRect.fromPoint = function( x, y ) {
     return( new Kinetic.BoundsRect(x, y, 0, 0) );
 };
 
@@ -55,8 +52,7 @@ Kinetic.BoundsRect.prototype = {
      Returns the top y-coordinate
      @returns {Number}
      */
-    getTop: function()
-    {
+    getTop: function() {
         return( this.y );
     },
     
@@ -64,8 +60,7 @@ Kinetic.BoundsRect.prototype = {
      Returns the left x-coordinate
      @returns {Number}
      */
-    getLeft: function()
-    {
+    getLeft: function() {
         return( this.x );
     },
     
@@ -73,8 +68,7 @@ Kinetic.BoundsRect.prototype = {
      Returns the bottom y-coordinate
      @returns {Number}
      */
-    getBottom: function()
-    {
+    getBottom: function() {
         return( this.y + this.height );
     },
     
@@ -82,8 +76,7 @@ Kinetic.BoundsRect.prototype = {
      Returns the right x-coordinate
      @returns {Number}
      */
-    getRight: function()
-    {
+    getRight: function() {
         return( this.x + this.width );
     },
     
@@ -92,8 +85,7 @@ Kinetic.BoundsRect.prototype = {
      @param {Kinetic.BoundsRect} rect
      @returns {Boolean}  True if it overlaps
      */
-    overlaps: function( rect )
-    {
+    overlaps: function( rect ) {
         var myRight = this.x + this.width,
             myBottom = this.y + this.height,
             rectRight = rect.x + rect.width,
@@ -108,8 +100,7 @@ Kinetic.BoundsRect.prototype = {
      @param      {Kinetic.BoundsRect}   rect
      @returns    {Kinetic.BoundsRect}  the current instance
      */
-    encloseRect: function( rect )
-    {
+    encloseRect: function( rect ) {
         var rightMax = Math.max( this.x + this.width, rect.x + rect.width ),
             bottomMax = Math.max( this.y + this.height, rect.y+ rect.height );
     
@@ -127,8 +118,7 @@ Kinetic.BoundsRect.prototype = {
      @param      {Number}   y
      @returns    {Kinetic.BoundsRect}  the current instance
      */
-    enclosePoint: function( x, y )
-    {
+    enclosePoint: function( x, y ) {
         var rightMax = Math.max( this.x + this.width, x ),
             bottomMax = Math.max( this.y + this.height, y );
 
@@ -145,8 +135,7 @@ Kinetic.BoundsRect.prototype = {
     @param {Kinetic.BoundsRect} rect
     @returns {Boolean}  True if it's equal
     */
-    isEqual: function( rect )
-    {
+    isEqual: function( rect ) {
         return( this.x === rect.x && this.y === rect.y && this.width === rect.width && this.height === rect.height );
     },
 
@@ -155,8 +144,7 @@ Kinetic.BoundsRect.prototype = {
      @param     {Kinetic.Transform} transform
      @returns   {Kinetic.BoundsRect}  the current instance with transformation applied
      */
-    transform: function( transform )
-    {
+    transform: function( transform ) {
         // OPTIMIZATION: For non-rotations or 0 dimension bounds, just transform the start point and we're done...
         if( !transform.hasRotation() || (this.width == 0 && this.height == 0) ) {
             this.width *= transform.m[0];
@@ -196,8 +184,7 @@ Kinetic.BoundsRect.prototype = {
      Clones the current rect
      @returns    {Kinetic.BoundsRect}  new instance of a rect..
      */
-    clone: function()
-    {
+    clone: function() {
         return( new Kinetic.BoundsRect(this.x, this.y, this.width, this.height) );
     }
 };
