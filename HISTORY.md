@@ -1,11 +1,9 @@
 # KineticJs Extended Version History
 
-## v3.8.2.1
-Branched from Eric Rowell's KineticJs library (v3.8.2)
-
-### New Features
-- Added matrix transform class
-- Added functionality to retrieve a node's transform
+## Development
+### New Features:
+- Added support for tilesets/spritesheets - Kinetic.TileSet
+- Added support for tilemap shapes - Kinetic.TileMap
 
 ## v3.8.2.2
 ### New Features:
@@ -25,3 +23,11 @@ Branched from Eric Rowell's KineticJs library (v3.8.2)
 - Integrated Yusuf Sasak's library modifications to allow overriding the default shape detection functionality
 - Integrated Eric Rowell's transition support
 - Integrated Eric Rowell's drag functionality changes
+
+## v3.8.2.1
+Branched from Eric Rowell's KineticJs library (v3.8.2)
+
+### New Features
+- Added matrix transform class
+- Added functionality to retrieve a node's transform
+
