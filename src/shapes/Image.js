@@ -6,6 +6,10 @@
  * @constructor
  * @augments Kinetic.Shape
  * @param {Object} config
+ *
+ * @config  {Number}                    width
+ * @config  {Number}                    height
+ * @config  {Image|Kinetic.TileInfo}    image
  */
 Kinetic.Image = function(config) {
     // defaults
@@ -16,13 +20,8 @@ Kinetic.Image = function(config) {
         config.height = config.image.height;
     }
 
-    config.drawFunc = function() {
-        var context = this.getContext();
-        context.beginPath();
-        context.rect(0, 0, this.width, this.height);
-        context.closePath();
-        context.drawImage(this.image, 0, 0, this.width, this.height);
-    };
+    config.drawFunc = this._customDraw;
+
     // call super constructor
     Kinetic.Shape.apply(this, [config]);
 };
@@ -32,7 +31,7 @@ Kinetic.Image = function(config) {
 Kinetic.Image.prototype = {
     /**
      * set image
-     * @param {Image} image
+     * @param {Image|Kinetic.TileInfo} image
      */
     setImage: function(image) {
         this.image = image;
@@ -82,14 +81,29 @@ Kinetic.Image.prototype = {
         this.invalidateBoundsLocal();
     },
     /**
+     * custom draw function
+     */
+    _customDraw: function() {
+        var context = this.getContext(),
+            image = this.image;
+
+        context.beginPath();
+        context.rect(0, 0, this.width, this.height);
+        context.closePath();
+
+        if( image instanceof Kinetic.TileInfo ) {
+            context.drawImage(image.image, image.offsetX, image.offsetY, image.width, image.height, 0, 0, this.width, this.height);
+            return;
+        }
+
+        context.drawImage(this.image, 0, 0, this.width, this.height);
+    },
+    /**
      * calculates the untransformed local bounds for the node
      * @returns {Kinetic.BoundsRect}
      */
     _calcNodeBoundsLocalUntransformed: function()
     {
-        if( this.width == null || this.height == null )
-            return( Kinetic.Image.base._calcNodeBoundsLocalUntransformed.apply(this) );
-
         return( new Kinetic.BoundsRect(0, 0, this.width, this.height) );
     }
 };

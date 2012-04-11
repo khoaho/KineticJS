@@ -4,6 +4,7 @@
 ### New Features:
 - Added support for tilesets/spritesheets - Kinetic.TileSet
 - Added support for tilemap shapes - Kinetic.TileMap
+- Kinetic.Image modified to accept Kinetic.TileInfo as a valid image setting
 
 ## v3.8.2.2
 ### New Features:
