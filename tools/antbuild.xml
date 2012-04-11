@@ -38,7 +38,6 @@
 		<file name='${dir.src}/Shape.js'/>
         <file name='${dir.src}/tiles/TileInfo.js'/>
         <file name='${dir.src}/tiles/TileSet.js'/>
-        <file name='${dir.src}/tiles/TileMapSpot.js'/>
 		<file name='${dir.src}/shapes/Rect.js'/>
 		<file name='${dir.src}/shapes/Circle.js'/>
 		<file name='${dir.src}/shapes/Image.js'/>
