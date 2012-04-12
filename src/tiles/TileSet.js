@@ -43,20 +43,23 @@ Kinetic.TileSet.prototype = {
      * Adds a sprite sheet to the tileset
      * @param {Object} config
      *
-     * @config {Number}         firstgid        Tile ID start
-     * @config {String|Image}   image           Image or image URL to use
-     * @config {Number}         imagewidth      Image width
-     * @config {Number}         imageheight     Image height
-     * @config {Number}         tilewidth       Tile width
-     * @config {Number}         tileheight      Tile height
-     * @config {Number}         [tilesnum]      Number of tiles in the spritesheet
+     * @config {Number}         firstgid            Tile ID start
+     * @config {String|Image}   image               Image or image URL to use
+     * @config {Number}         imagewidth          Image width
+     * @config {Number}         imageheight         Image height
+     * @config {Number}         tilewidth           Tile width
+     * @config {Number}         tileheight          Tile height
+     * @config {Number}         [tilesnum]          Number of tiles in the spritesheet
+     * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
      */
     addSpriteSheet: function( config )
     {
         var imageRes,
             tilesPerRow, tilesPerCol,
             tilesNum,
+            tilePropsMap,
             tileIdCurr,
+            tileProps,
             indexX, indexY, tileIndex,
             texCurrX, texCurrY;
 
@@ -81,6 +84,7 @@ Kinetic.TileSet.prototype = {
         }
 
         // When processing tiles, go left to right, then top to bottom...
+        tilePropsMap = config.tileproperties;
         tileIdCurr = config.firstgid;
         tileIndex = 0;
         texCurrY = 0;
@@ -96,7 +100,13 @@ Kinetic.TileSet.prototype = {
                 if( tileIndex >= tilesNum )
                     break;
 
-                this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight );
+                tileProps = null;
+                if( tilePropsMap != null )
+                {
+                    if( tilePropsMap.hasOwnProperty(tileIndex) )
+                        tileProps = tilePropsMap[tileIndex];
+                }
+                this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight, tileProps );
                 tileIdCurr++;
 
                 texCurrX += config.tilewidth;

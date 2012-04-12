@@ -9,9 +9,9 @@ KineticJs Extended "extends" KineticJs, an HTML5 Canvas JavaScript library.
 - Overridable drag behavior
 - Stage view bounds limiting
 
-## In Development
-- Tileset support
-- Tilemap support
+## Features in development
+- Tileset support ([Tiled map editor](http://www.mapeditor.org/) compatible)
+- Tilemap support ([Tiled map editor](http://www.mapeditor.org/) compatible)
 
 ## Attribution
 The library also includes substantial portions of Simon Sarris's Transform Javascript class 

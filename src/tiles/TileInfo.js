@@ -10,11 +10,13 @@
  * @param {Number}  offsetY         The tile source start x-offset
  * @param {Number}  width           The tile source width
  * @param {Number}  height          The tile source height
+ * @param {Object}  propsExtra      Additional tile properties
  */
-Kinetic.TileInfo = function( image, offsetX, offsetY, width, height ) {
+Kinetic.TileInfo = function( image, offsetX, offsetY, width, height, propsExtra ) {
     this.image = image;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.width = width;
     this.height = height;
+    this.propsExtra = propsExtra;
 };

@@ -3,7 +3,9 @@
 ## Development
 ### New Features:
 - Added support for tilesets/spritesheets - Kinetic.TileSet
+  - Tileset support is compatible with [Tiled map editor](http://www.mapeditor.org/) tilesets
 - Added support for tilemap shapes - Kinetic.TileMap
+  - Tilemap shapes are compatible with [Tiled map editor](http://www.mapeditor.org/) tile layers
 - Kinetic.Image modified to accept Kinetic.TileInfo as a valid image setting
 
 ## v3.8.2.2
