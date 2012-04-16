@@ -10,7 +10,7 @@
  */
 Kinetic.TileSet = function( config ) {
     this.images = new Array();
-    this.tiles = new Array();
+    this.tiles = new Object();
     this.tileWidthMax = 0;
     this.tileHeightMax = 0;
 
@@ -51,6 +51,9 @@ Kinetic.TileSet.prototype = {
      * @config {Number}         tileheight          Tile height
      * @config {Number}         [tilesnum]          Number of tiles in the spritesheet
      * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
+     *
+     * @tileproperties {String} name                Tile name. Use this to specify a custom name that can be used
+     *                                              for retrieval
      */
     addSpriteSheet: function( config )
     {
@@ -59,6 +62,7 @@ Kinetic.TileSet.prototype = {
             tilesNum,
             tilePropsMap,
             tileIdCurr,
+            tileName,
             tileProps,
             indexX, indexY, tileIndex,
             texCurrX, texCurrY;
@@ -101,12 +105,17 @@ Kinetic.TileSet.prototype = {
                     break;
 
                 tileProps = null;
-                if( tilePropsMap != null )
-                {
-                    if( tilePropsMap.hasOwnProperty(tileIndex) )
+                if( tilePropsMap != null ) {
+                    if( tilePropsMap.hasOwnProperty(tileIndex) ) {
                         tileProps = tilePropsMap[tileIndex];
+                    }
                 }
                 this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight, tileProps );
+
+                // If the tile has a specific name, recognize the tile by its name...
+                if( tileProps != null && tileProps.name != null )
+                    this.tiles[ tileProps.name ] = this.tiles[ tileIdCurr ];
+
                 tileIdCurr++;
 
                 texCurrX += config.tilewidth;
@@ -119,15 +128,14 @@ Kinetic.TileSet.prototype = {
 
     /*
      * Returns the requested tile info
-     * @param {Number} tileId
+     * @param {Number|String} tileId
      * @returns {Kinetic.TileInfo}  The requested tile. null otherwise
      */
     getTile: function( tileId ) {
-        var tileCurr = this.tiles[ tileId ];
-        if( !(tileCurr instanceof Kinetic.TileInfo) )
+        if( !this.tiles.hasOwnProperty(tileId) )
             return( null );
 
-        return( tileCurr );
+        return( this.tiles[ tileID ] );
     },
 
     /*
