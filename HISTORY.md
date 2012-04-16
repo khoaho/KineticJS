@@ -4,6 +4,7 @@
 ### New Features:
 - Added support for tilesets/spritesheets - Kinetic.TileSet
   - Tileset support is compatible with [Tiled map editor](http://www.mapeditor.org/) tilesets
+  - Tiles may named and its name used in lookups (Kinetic.TileSet::getTile())
 - Added support for tilemap shapes - Kinetic.TileMap
   - Tilemap shapes are compatible with [Tiled map editor](http://www.mapeditor.org/) tile layers
 - Kinetic.Image modified to accept Kinetic.TileInfo as a valid image setting
