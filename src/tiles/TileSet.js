@@ -62,7 +62,6 @@ Kinetic.TileSet.prototype = {
             tilesNum,
             tilePropsMap,
             tileIdCurr,
-            tileName,
             tileProps,
             indexX, indexY, tileIndex,
             texCurrX, texCurrY;
