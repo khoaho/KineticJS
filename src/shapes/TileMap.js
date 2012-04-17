@@ -44,6 +44,25 @@ Kinetic.TileMap = function( config ) {
 
 Kinetic.TileMap.prototype = {
     /*
+     *  Converts a local position to grid position
+     *  @param {Number}    posX
+     *  @param {Number}    posY
+     *
+     *  @returns {Object} gridPos
+     *
+     *  @tilePos {Number} x
+     *  @tilePos {Number} y
+     */
+    localPosToGridPos: function( posX, posY ) {
+        var gridPos =
+        {
+            x: Math.floor( posX / this.spotWidth ),
+            y: Math.floor( posY / this.spotHeight )
+        };
+
+        return( gridPos );
+    },
+    /*
      *  Returns a spot by coordinate
      *  @param {Number}    gridX
      *  @param {Number}    gridY
