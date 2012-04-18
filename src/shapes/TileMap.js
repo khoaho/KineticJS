@@ -63,6 +63,22 @@ Kinetic.TileMap.prototype = {
         return( gridPos );
     },
     /*
+     *  Converts a grid position to a spot index
+     *  @param {Number}    gridX
+     *  @param {Number}    gridY
+     *
+     *  @returns {Number} spotIndex     -1 if it's an invalid grid position
+     */
+    gridPosToSpotIndex: function( gridX, gridY )
+    {
+        if( gridX < 0 || gridX >= this.gridColumns )
+            return -1;
+        if( gridY < 0 || gridY >= this.gridRows )
+            return -1;
+
+        return gridX + ( gridY*this.gridColumns );
+    },
+    /*
      *  Returns a spot by coordinate
      *  @param {Number}    gridX
      *  @param {Number}    gridY
@@ -207,15 +223,15 @@ Kinetic.GlobalObject.extend(Kinetic.TileMap, Kinetic.Shape);
  * @param {Number}              gridCol             The grid column
  * @param {Number}              gridRow             The grid row
  * @param {Number}              spotIndex           The spot index
- * @param {Kinetic.BoundsRect}  mapBounds           The grid map bounds
+ * @param {Kinetic.BoundsRect}  spotBounds          The grid spot bounds
  * @param {Kinetic.TileSet}     tileset             The tile set to use
  * @param {Number}              [tileId]            The tile ID.
  */
-Kinetic.TileMap.Spot = function( gridCol, gridRow, spotIndex, mapBounds, tileset, tileId  ) {
+Kinetic.TileMap.Spot = function( gridCol, gridRow, spotIndex, spotBounds, tileset, tileId  ) {
     this.gridCol        = gridCol;
     this.gridRow        = gridRow;
     this.spotIndex      = spotIndex;
-    this.mapBounds      = mapBounds;
+    this.spotBounds     = spotBounds;
     this.tileId         = null;
     this.tileset        = tileset;
 
@@ -256,14 +272,8 @@ Kinetic.TileMap.Spot.prototype = {
      */
     setTile: function( tileId )
     {
-        if( tileId === undefined )
-            tileId = null;
-
         this.tileId = tileId;
-
-        if( tileId !== null )
-            this.tileInfo = this.tileset.getTile( tileId );
-
+        this.tileInfo = this.tileset.getTile( tileId );
         this.drawPos = undefined;
     },
 
@@ -292,8 +302,8 @@ Kinetic.TileMap.Spot.prototype = {
         // Time to calculate the deferred draw position?
         if( this.drawPos === undefined ) {
             this.drawPos = {
-                x: this.mapBounds.x + ((tileInfo.width - this.mapBounds.width) * -0.5),
-                y: this.mapBounds.y - (tileInfo.height - this.mapBounds.height)
+                x: this.spotBounds.x + ((tileInfo.width - this.spotBounds.width) * -0.5),
+                y: this.spotBounds.y - (tileInfo.height - this.spotBounds.height)
             }
         }
 
@@ -309,7 +319,7 @@ Kinetic.TileMap.Spot.prototype = {
      */
     getBounds: function()
     {
-        return( this.mapBounds );
+        return( this.spotBounds );
     },
 
     /*

@@ -134,7 +134,7 @@ Kinetic.TileSet.prototype = {
         if( !this.tiles.hasOwnProperty(tileId) )
             return( null );
 
-        return( this.tiles[ tileID ] );
+        return( this.tiles[ tileId ] );
     },
 
     /*
