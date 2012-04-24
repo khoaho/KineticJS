@@ -217,12 +217,10 @@ Kinetic.Stage.prototype = {
             scaleY = scaleX;
 
         if( scaleX === 1 && scaleY === 1 )
-        {
             this.appliedViewScale = null;
-            return;
-        }
+        else
+            this.appliedViewScale = { x:scaleX, y:scaleY };
 
-        this.appliedViewScale = { x:scaleX, y:scaleY };
         this._recalcViewLimitsAndApply();
     },
     /**
