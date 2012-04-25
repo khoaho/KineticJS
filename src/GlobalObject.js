@@ -244,6 +244,7 @@ Kinetic.GlobalObject = {
         if( this.isLoopActive )
             return;
 
+        this.isLoopActive = true;
         var that = this;
         requestAnimFrame(function() {
             that._animationLoop();
