@@ -17,9 +17,9 @@ Kinetic.TileSet = function( config ) {
     if( config !== undefined )
     {
         if( config instanceof Array ) {
-            this.addSpriteSheets( config );
+            this.addTileSheets( config );
         } else {
-            this.addSpriteSheet( config );
+            this.addTileSheet( config );
         }
     }
 };
@@ -30,7 +30,7 @@ Kinetic.TileSet.prototype = {
      * Adds multiple sprite sheets to the tileset
      * @param {Object[]} config         See addSpriteSheet() for the configuration definition
      */
-    addSpriteSheets: function( config ) {
+    addTileSheets: function( config ) {
         var spriteSheetsNum = config.length,
             index;
 
@@ -50,19 +50,21 @@ Kinetic.TileSet.prototype = {
      * @config {Number}         tilewidth           Tile width
      * @config {Number}         tileheight          Tile height
      * @config {Number}         [tilesnum]          Number of tiles in the spritesheet
+     * @config {Object}         [properties]        Tile sheet properties
      * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
      *
      * @tileproperties {String} name                Tile name. Use this to specify a custom name that can be used
      *                                              for retrieval
      */
-    addSpriteSheet: function( config )
+    addTileSheet: function( config )
     {
         var imageRes,
             tilesPerRow, tilesPerCol,
             tilesNum,
-            tilePropsMap,
+            mapPropsCustomTile,
+            propsCustomSheet,
             tileIdCurr,
-            tileProps,
+            propsCustomTile,
             indexX, indexY, tileIndex,
             texCurrX, texCurrY;
 
@@ -87,7 +89,8 @@ Kinetic.TileSet.prototype = {
         }
 
         // When processing tiles, go left to right, then top to bottom...
-        tilePropsMap = config.tileproperties;
+        mapPropsCustomTile = config.tileproperties;
+        propsCustomSheet = config.properties;
         tileIdCurr = config.firstgid;
         tileIndex = 0;
         texCurrY = 0;
@@ -103,17 +106,17 @@ Kinetic.TileSet.prototype = {
                 if( tileIndex >= tilesNum )
                     break;
 
-                tileProps = null;
-                if( tilePropsMap != null ) {
-                    if( tilePropsMap.hasOwnProperty(tileIndex) ) {
-                        tileProps = tilePropsMap[tileIndex];
+                propsCustomTile = null;
+                if( mapPropsCustomTile != null ) {
+                    if( mapPropsCustomTile.hasOwnProperty(tileIndex) ) {
+                        propsCustomTile = mapPropsCustomTile[tileIndex];
                     }
                 }
-                this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight, tileProps );
+                this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight, propsCustomSheet, propsCustomTile );
 
                 // If the tile has a specific name, recognize the tile by its name...
-                if( tileProps != null && tileProps.name != null )
-                    this.tiles[ tileProps.name ] = this.tiles[ tileIdCurr ];
+                if( propsCustomTile != null && propsCustomTile.name != null )
+                    this.tiles[ propsCustomTile.name ] = this.tiles[ tileIdCurr ];
 
                 tileIdCurr++;
 
