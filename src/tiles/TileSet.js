@@ -35,7 +35,7 @@ Kinetic.TileSet.prototype = {
             index;
 
         for( index = 0; index < spriteSheetsNum; index++ ) {
-            this.addSpriteSheet( config[index] );
+            this.addTileSheet( config[index] );
         }
     },
 
