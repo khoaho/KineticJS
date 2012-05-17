@@ -6,7 +6,8 @@
  *
  * NOTE: The tileset configuration information is compatible with Tiled tileset definition
  * @constructor
- * @param {Object|Object[]}  [config]      Spritesheet(s) configuration. See addSpriteSheet() for configuration format.
+ * @param {Object|Object[]}  [config]       Tile configuration(S). See addSpriteSheet() and addTileAtlas() for the
+ *                                          configuration definition
  */
 Kinetic.TileSet = function( config ) {
     this.images = new Array();
@@ -17,9 +18,11 @@ Kinetic.TileSet = function( config ) {
     if( config !== undefined )
     {
         if( config instanceof Array ) {
-            this.addTileSheets( config );
-        } else {
+            this.addTileConfigs( config );
+        } else if( this.isTileSheetConfig(config) ) {
             this.addTileSheet( config );
+        } else {
+            this.addTileAtlas( config );
         }
     }
 };
@@ -27,20 +30,26 @@ Kinetic.TileSet = function( config ) {
 Kinetic.TileSet.prototype = {
 
     /*
-     * Adds multiple sprite sheets to the tileset
-     * @param {Object[]} config         See addSpriteSheet() for the configuration definition
+     * Adds multiple tile configurations to the tile set
+     * @param {Object[]} config         See addTileSheet() and addTileAtlas() for the configuration definition
      */
-    addTileSheets: function( config ) {
+    addTileConfigs: function( config ) {
         var spriteSheetsNum = config.length,
-            index;
+            index,
+            configCurr;
 
         for( index = 0; index < spriteSheetsNum; index++ ) {
-            this.addTileSheet( config[index] );
+            configCurr = config[ index ];
+
+            if( this.isTileSheetConfig(config) )
+                this.addTileSheet( configCurr );
+            else
+                this.addTileAtlas( configCurr );
         }
     },
 
     /*
-     * Adds a sprite sheet to the tileset
+     * Adds a tile sheet to the tile set
      * @param {Object} config
      *
      * @config {Number}         firstgid            Tile ID start
@@ -112,6 +121,7 @@ Kinetic.TileSet.prototype = {
                         propsCustomTile = mapPropsCustomTile[tileIndex];
                     }
                 }
+
                 this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, texCurrX, texCurrY, config.tilewidth, config.tileheight, propsCustomSheet, propsCustomTile );
 
                 // If the tile has a specific name, recognize the tile by its name...
@@ -125,6 +135,75 @@ Kinetic.TileSet.prototype = {
             }
 
             texCurrY += config.tileheight;
+        }
+    },
+
+    /*
+     * Adds a tile atlas to the tile set
+     * @param {Object} config
+     *
+     * @config {Number}         firstgid            Tile ID start
+     * @config {String|Image}   image               Image or image URL to use
+     * @config {Number}         imagewidth          Image width
+     * @config {Number}         imageheight         Image height
+     * @config {Object[]}       tilespec            Array of tile specifications
+     * @config {Object}         [properties]        Tile sheet properties
+     * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
+     *
+     * @tilespec        {String} [name]             The tile's name. Use this to specify a custom name that can be used
+     *                                              for retrieval
+     * @tilespec        {Number} x                  The tile's top-left x-coordinate
+     * @tilespec        {Number} y                  The tile's top-left y-coordinate
+     * @tilespec        {Number} width              The tile's width
+     * @tilespec        {Number} height             The tile's height
+     */
+    addTileAtlas: function( config )
+    {
+        var imageRes,
+            mapPropsCustomTile,
+            propsCustomSheet,
+            tilesNum,
+            tileIdCurr,
+            tileSpecCurr,
+            propsCustomTile,
+            tileIndex;
+
+        // Add the texture to the list (if applicable)...
+        if( config.image instanceof Image ) {
+            imageRes = config.image;
+        } else {
+            imageRes = new Image();
+            imageRes.src = config.image;
+        }
+
+        this.images.push( imageRes );
+        this.tileWidthMax = Math.max( this.tileWidthMax, config.tilewidth );
+        this.tileHeightMax = Math.max( this.tileHeightMax, config.tileheight );
+
+        // When processing tiles, go left to right, then top to bottom...
+        mapPropsCustomTile = config.tileproperties;
+        propsCustomSheet = config.properties;
+        tilesNum = config.tilespec.length;
+        tileIdCurr = config.firstgid;
+        for( tileIndex = 0; tileIndex < tilesNum; tileIndex++ ) {
+
+            propsCustomTile = null;
+            if( mapPropsCustomTile != null ) {
+                if( mapPropsCustomTile.hasOwnProperty(tileIndex) ) {
+                    propsCustomTile = mapPropsCustomTile[tileIndex];
+                }
+            }
+
+            tileSpecCurr = config.tilespec[ tileIndex ];
+            this.tiles[ tileIdCurr ] = new Kinetic.TileInfo( imageRes, tileSpecCurr.x, tileSpecCurr.y, tileSpecCurr.width, tileSpecCurr.height, propsCustomSheet, propsCustomTile );
+            this.tileWidthMax = Math.max( this.tileWidthMax, tileSpecCurr.width );
+            this.tileHeightMax = Math.max( this.tileHeightMax, tileSpecCurr.height );
+
+            // If the tile has a specific name, recognize the tile by its name...
+            if( tileSpecCurr.name != null )
+                this.tiles[ tileSpecCurr.name ] = this.tiles[ tileIdCurr ];
+
+            tileIdCurr++;
         }
     },
 
@@ -154,5 +233,15 @@ Kinetic.TileSet.prototype = {
      */
     getTileSizeMax: function() {
         return { x: this.tileWidthMax, y: this.tileHeightMax };
+    },
+
+    /*
+     * Returns true if the passed in configuration is a tile sheet configuration
+     *
+     * @param   {Object}    config
+     * @returns {Boolean}
+     */
+    isTileSheetConfig: function( config ) {
+        return( config.tilewidth != null && config.tileheight != null );
     }
 };

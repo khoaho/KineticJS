@@ -309,23 +309,20 @@ Kinetic.Stage.prototype = {
     },
     /**
      * get mouse position for desktop apps
-     * @param {Event} evt
      */
-    getMousePosition: function(evt) {
+    getMousePosition: function() {
         return this.mousePos;
     },
     /**
      * get touch position for mobile apps
-     * @param {Event} evt
      */
-    getTouchPosition: function(evt) {
+    getTouchPosition: function() {
         return this.touchPos;
     },
     /**
      * get user position (mouse position or touch position)
-     * @param {Event} evt
      */
-    getUserPosition: function(evt) {
+    getUserPosition: function() {
         return this.getTouchPosition() || this.getMousePosition();
     },
     /**
