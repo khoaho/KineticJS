@@ -7,9 +7,9 @@
  * @augments Kinetic.Shape
  * @param {Object} config
  *
- * @config  {Number}                    width
- * @config  {Number}                    height
  * @config  {Image|Kinetic.TileInfo}    image
+ * @config  {Number}                    [width]
+ * @config  {Number}                    [height]
  */
 Kinetic.Image = function(config) {
     // defaults

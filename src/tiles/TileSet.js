@@ -41,7 +41,7 @@ Kinetic.TileSet.prototype = {
         for( index = 0; index < spriteSheetsNum; index++ ) {
             configCurr = config[ index ];
 
-            if( this.isTileSheetConfig(config) )
+            if( this.isTileSheetConfig(configCurr) )
                 this.addTileSheet( configCurr );
             else
                 this.addTileAtlas( configCurr );
@@ -144,8 +144,6 @@ Kinetic.TileSet.prototype = {
      *
      * @config {Number}         firstgid            Tile ID start
      * @config {String|Image}   image               Image or image URL to use
-     * @config {Number}         imagewidth          Image width
-     * @config {Number}         imageheight         Image height
      * @config {Object[]}       tilespec            Array of tile specifications
      * @config {Object}         [properties]        Tile sheet properties
      * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
