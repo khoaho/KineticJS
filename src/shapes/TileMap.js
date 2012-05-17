@@ -310,7 +310,14 @@ Kinetic.TileMap.Spot.prototype = {
         drawPos = this.drawPos;
         width = tileInfo.width;
         height = tileInfo.height;
-        drawCtx.drawImage( tileInfo.image, tileInfo.offsetX, tileInfo.offsetY, width, height, drawPos.x, drawPos.y, width, height );
+        try
+        {
+            drawCtx.drawImage( tileInfo.image, tileInfo.offsetX, tileInfo.offsetY, width, height, drawPos.x, drawPos.y, width, height );
+        }
+        catch( err )
+        {
+            // Do nothing here - this is to get around issues with bad/missing images
+        }
     },
 
     /*

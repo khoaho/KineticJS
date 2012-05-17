@@ -91,12 +91,19 @@ Kinetic.Image.prototype = {
         context.rect(0, 0, this.width, this.height);
         context.closePath();
 
-        if( image instanceof Kinetic.TileInfo ) {
-            context.drawImage(image.image, image.offsetX, image.offsetY, image.width, image.height, 0, 0, this.width, this.height);
-            return;
-        }
+        try
+        {
+            if( image instanceof Kinetic.TileInfo ) {
+                context.drawImage(image.image, image.offsetX, image.offsetY, image.width, image.height, 0, 0, this.width, this.height);
+                return;
+            }
 
-        context.drawImage(this.image, 0, 0, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height);
+        }
+        catch( err )
+        {
+            // Do nothing here - this is to get around issues with bad/missing images
+        }
     },
     /**
      * calculates the untransformed local bounds for the node
