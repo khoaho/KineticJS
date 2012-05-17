@@ -10,8 +10,10 @@
 - Kinetic.TileMap
   - Added support for tilemap shapes. Tilemap shapes are compatible with
     [Tiled map editor](http://www.mapeditor.org/) tile layers
+  - Increased drawing robustness against bad/missing image data
 - Kinetic.Image
   - Modified to accept Kinetic.TileInfo as a valid image specifier
+  - Increased drawing robustness against bad/missing image data
 
 ## v3.8.2.2
 ### New Features:
