@@ -175,8 +175,6 @@ Kinetic.TileSet.prototype = {
         }
 
         this.images.push( imageRes );
-        this.tileWidthMax = Math.max( this.tileWidthMax, config.tilewidth );
-        this.tileHeightMax = Math.max( this.tileHeightMax, config.tileheight );
 
         // When processing tiles, go left to right, then top to bottom...
         mapPropsCustomTile = config.tileproperties;
