@@ -289,7 +289,7 @@ Kinetic.TileMap.Spot.prototype = {
 
     /*
      * Draws the tile in the specified context
-     * @param {CanvasRenderingContext2D} drawCtx
+     * @param {CanvasContext} drawCtx
      */
     draw: function( drawCtx ) {
         var tileInfo = this.tileInfo,

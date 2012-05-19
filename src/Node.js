@@ -587,7 +587,7 @@ Kinetic.Node.prototype = {
                 this.centerOffset.y = localBounds.getBottom();
                 break;
 
-            case "center":
+            case "middle":
                 this.centerOffset.y = localBounds.y + (localBounds.height * 0.5);
                 break;
 
