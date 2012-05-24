@@ -16,6 +16,8 @@ Kinetic.GlobalObject = {
     tempCanvas: null,
     isLoopActive: false,
     frameUpdateMs: 1000/ 60,
+    lastUpdateTimeMs: 0,
+    isCustomFrameUpdate: false,
     frame: {
         time: 0,
         timeDiff: 0,
@@ -227,17 +229,31 @@ Kinetic.GlobalObject = {
         }
     },
     _animationLoop: function() {
+        if( !this.isCustomFrameUpdate ) {
+            var currTimeMs = (new Date()).getTime();
+            if( this.lastUpdateTimeMs > 0 ) {
+                // Frame limit!
+                if( currTimeMs - this.lastUpdateTimeMs < this.frameUpdateMs ) {
+                    this._scheduleLoop();
+                    return;
+                }
+
+                // If we get here, we have an update to process...
+                this.lastUpdateTimeMs = currTimeMs;
+            } else {
+                // First time activation? Do an update!
+                this.lastUpdateTimeMs = currTimeMs;
+            }
+        }
+
         if(this._isaCanvasAnimating()) {
             this._updateFrameObject();
             this._runFrames();
-            var that = this;
-            requestAnimFrame(function() {
-                that._animationLoop();
-            });
-
+            this._scheduleLoop();
             return;
         }
 
+        this.lastUpdateTimeMs = 0;
         this.isLoopActive = false;
     },
     _handleAnimation: function() {
@@ -245,6 +261,11 @@ Kinetic.GlobalObject = {
             return;
 
         this.isLoopActive = true;
+        this._scheduleLoop();
+    },
+    _scheduleLoop: function()
+    {
+        var that = this;
         var that = this;
         requestAnimFrame(function() {
             that._animationLoop();
@@ -259,8 +280,12 @@ Kinetic.GlobalObject = {
 };
 
 window.requestAnimFrame = (function() {
-    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-    function(callback) {
+    if( window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame )
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+
+    // If we get here, we're returning our own callback
+    Kinetic.GlobalObject.isCustomFrameUpdate = true;
+    return function(callback) {
         window.setTimeout(callback, Kinetic.GlobalObject.frameUpdateMs);
     };
 })();
