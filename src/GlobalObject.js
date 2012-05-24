@@ -266,7 +266,6 @@ Kinetic.GlobalObject = {
     _scheduleLoop: function()
     {
         var that = this;
-        var that = this;
         requestAnimFrame(function() {
             that._animationLoop();
         });
