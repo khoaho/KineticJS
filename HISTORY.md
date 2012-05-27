@@ -14,6 +14,7 @@
 - Kinetic.Image
   - Modified to accept Kinetic.TileInfo as a valid image specifier
   - Increased drawing robustness against bad/missing image data
+- Kinetic.Layer now fires off a 'resize' event whenever the layer size is modified [cbFunc( width:Number, height:Number ):void]
 
 ## v3.8.2.2
 ### New Features:

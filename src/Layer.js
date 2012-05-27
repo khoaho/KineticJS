@@ -47,9 +47,18 @@ Kinetic.Layer.prototype = {
      */
     setSize: function( width, height ) {
         var canvas = this.getCanvas();
+
         canvas.width = width;
         canvas.height = height;
+
         this.invalidateBoundsLocal();
+
+        var el = this.eventListeners[ "resize"] ;
+        if( el ) {
+            for(var i = 0; i < el.length; i++) {
+                el[i].handler.apply(this, arguments);
+            }
+        }
     },
     /**
      * gets the layer size
