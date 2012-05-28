@@ -53,7 +53,7 @@ Kinetic.Layer.prototype = {
 
         this.invalidateBoundsLocal();
 
-        var el = this.eventListeners[ "resize"] ;
+        var el = this.eventListeners[ "onresize"] ;
         if( el ) {
             for(var i = 0; i < el.length; i++) {
                 el[i].handler.apply(this, arguments);
