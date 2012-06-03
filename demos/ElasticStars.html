@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+		}
+
+		canvas {
+			border: 1px solid #9C9898;
+		}
+
+		#tango {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			padding: 10px;
+		}
+
+		#container {
+			background-image: url('http://www.html5canvastutorials.com/demos/assets/greenstars.jpg');
+			display: inline-block;
+			overflow: hidden;
+			height: 365px;
+			width: 580px;
+		}
+	</style>
+	<script src="../dist/kinetic-core.js"></script>
+	<script>
+		function addStar(layer, stage) {
+			var trans = null;
+			var scale = Math.random();
+
+			var star = new Kinetic.Star({
+				x: Math.random() * stage.getWidth(),
+				y: Math.random() * stage.getHeight(),
+				numPoints: 5,
+				innerRadius: 50,
+				outerRadius: 100,
+				fill: '#1e4705',
+				stroke: '#89b717',
+				alpha: 0.9,
+				strokeWidth: 10,
+				draggable: true,
+				scale: {
+					x: scale,
+					y: scale
+				},
+				rotationDeg: Math.random() * 180,
+				shadow: {
+					color: 'black',
+					blur: 10,
+					offset: [5, 5],
+					alpha: 0.6
+				},
+				startScale: scale
+			});
+
+			star.on('dragstart', function () {
+				if (trans) {
+					trans.stop();
+				}
+
+				star.moveToTop();
+
+				star.setAttrs({
+					shadow: {
+						offset: {
+							x: 15,
+							y: 15
+						}
+					},
+					scale: {
+						x: star.attrs.startScale * 1.2,
+						y: star.attrs.startScale * 1.2
+					}
+				});
+			});
+
+			star.on('dragend', function () {
+				trans = star.transitionTo({
+					duration: 0.5,
+					easing: 'elastic-ease-out',
+					shadow: {
+						offset: {
+							x: 5,
+							y: 5
+						}
+					},
+					scale: {
+						x: star.attrs.startScale,
+						y: star.attrs.startScale
+					}
+				})
+			});
+			layer.add(star);
+		}
+
+		window.onload = function () {
+			var stage = new Kinetic.Stage({
+				container: 'container',
+				width: 578,
+				height: 363
+			});
+
+			var layer = new Kinetic.Layer();
+
+			for (var n = 0; n < 10; n++) {
+				addStar(layer, stage);
+			}
+
+			stage.add(layer);
+		};
+	</script>
+</head>
+<body onmousedown="return false;">
+<div id="container"></div>
+</body>
+</html>

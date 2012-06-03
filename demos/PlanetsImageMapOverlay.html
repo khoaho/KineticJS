@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+			font-family: Calibri;
+		}
+
+		canvas {
+			border: 1px solid #9C9898;
+		}
+
+		#page {
+			position: relative;
+			width: 580px;
+			height: 253px;
+		}
+
+		#controls {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			z-index: 99999;
+		}
+
+		label {
+			color: white;
+			vertical-align: top;
+		}
+	</style>
+	<script src="../dist/kinetic-core.js"></script>
+	<script>
+		function writeMessage(messageLayer, message) {
+			var context = messageLayer.getContext();
+			context.fillStyle = "black";
+			context.fillRect(0, 0, 300, 40);
+			context.font = "20pt Calibri";
+			context.fillStyle = "white";
+			context.fillText(message, 10, 30);
+		}
+
+		window.onload = function () {
+			var stage = new Kinetic.Stage({
+				container: "container",
+				width: 578,
+				height: 251
+			});
+
+			var planetsLayer = new Kinetic.Layer();
+			var circlesLayer = new Kinetic.Layer();
+			var messageLayer = new Kinetic.Layer();
+
+			var planets = {
+				Mercury: {
+					x: 46,
+					y: 126,
+					radius: 32
+				},
+				Venus: {
+					x: 179,
+					y: 126,
+					radius: 79
+				},
+				Earth: {
+					x: 366,
+					y: 127,
+					radius: 85
+				},
+				Mars: {
+					x: 515,
+					y: 127,
+					radius: 45
+				}
+			};
+
+			var imageObj = new Image();
+			imageObj.onload = function () {
+				// draw shape overlays
+				for (var pubKey in planets) {
+					( function () {
+						var key = pubKey;
+						var planet = planets[key];
+
+						var planetOverlay = new Kinetic.Circle({
+							x: planet.x,
+							y: planet.y,
+							radius: planet.radius
+						});
+
+						planetOverlay.on("mouseover", function () {
+							writeMessage(messageLayer, key);
+						});
+						planetOverlay.on("mouseout", function () {
+							writeMessage(messageLayer, "");
+						});
+
+						circlesLayer.add(planetOverlay);
+					}());
+				}
+
+				var checkbox = document.getElementById("checkbox");
+				checkbox.addEventListener("click", function () {
+					var shapes = circlesLayer.getChildren();
+
+					// flip show property
+					for (var n = 0; n < shapes.length; n++) {
+						var shape = shapes[n];
+						var f = shape.getFill();
+						shape.setFill(f == "red" ? undefined : "red");
+					}
+
+					circlesLayer.draw();
+				}, false);
+
+				stage.add(planetsLayer);
+				stage.add(circlesLayer);
+				stage.add(messageLayer);
+
+				// draw planets
+				var planetsContext = planetsLayer.getContext();
+				planetsContext.drawImage(imageObj, 0, 0, stage.getWidth(), stage.getHeight());
+
+			};
+			imageObj.src = "assets/planets.png";
+		};
+	</script>
+</head>
+<body>
+<div id="page">
+	<div id="container"></div>
+	<div id="controls">
+		<input type="checkbox" id="checkbox">
+		<label> Show map overlay </label>
+	</div>
+</div>
+</body>
+</html>

@@ -9,22 +9,23 @@
  * @augments Kinetic.Node
  * @param {Object} config
  */
-Kinetic.Group = function(config) {
-    this.nodeType = 'Group';;
-    
-    // call super constructors
-    Kinetic.Container.apply(this, []);
-    Kinetic.Node.apply(this, [config]);
+Kinetic.Group = function (config) {
+	this.nodeType = 'Group';
+	;
+
+	// call super constructors
+	Kinetic.Container.apply(this, []);
+	Kinetic.Node.apply(this, [config]);
 };
 /* 
  * Group methods
  */
 Kinetic.Group.prototype = {
-    draw: function() {
-        if(this.attrs.visible) {
-            this._drawChildren();
-        }
-    }
+	draw: function () {
+		if (this.attrs.visible) {
+			this._drawChildren();
+		}
+	}
 };
 
 // Extend Container and Node

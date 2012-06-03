@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+		}
+
+		canvas {
+			border: 1px solid #9C9898;
+		}
+
+		#container {
+			background-image: url('assets/line-building.png');
+			background-position: 1px 0px;
+			background-repeat: no-repeat;
+			width: 579px;
+			height: 327px;
+		}
+	</style>
+	<script src="../dist/kinetic-core.js"></script>
+	<script>
+		function getData() {
+			return {
+				'1st Floor': {
+					color: 'blue',
+					points: [366, 298, 500, 284, 499, 204, 352, 183, 72, 228, 74, 274]
+				},
+				'2nd Floor': {
+					color: "red",
+					points: [72, 228, 73, 193, 340, 96, 498, 154, 498, 191, 341, 171]
+				},
+				'3rd Floor': {
+					color: "yellow",
+					points: [73, 192, 73, 160, 340, 23, 500, 109, 499, 139, 342, 93]
+				},
+				'Gym': {
+					color: "green",
+					points: [498, 283, 503, 146, 560, 136, 576, 144, 576, 278, 500, 283]
+				}
+			}
+		}
+		function drawTooltip(tooltip, x, y, text) {
+			tooltip.setText(text);
+			var maxRight = 530;
+			if (x > maxRight) {
+				x = maxRight;
+			}
+			tooltip.setPosition(x, y);
+			tooltip.show();
+			tooltip.getLayer().draw();
+		}
+
+		window.onload = function () {
+			var stage = new Kinetic.Stage({
+				container: "container",
+				width: 578,
+				height: 325
+			});
+			var shapesLayer = new Kinetic.Layer();
+			/*
+			 * throttle the tooltip layer down a bit
+			 * so that the tooltip doesn't lag behind the
+			 * mouse too much on redraw
+			 */
+			var tooltipLayer = new Kinetic.Layer({
+				throttle: 50
+			});
+
+			// build tooltip
+			var tooltip = new Kinetic.Text({
+				text: "",
+				textFill: "white",
+				fontFamily: "Calibri",
+				fontSize: 12,
+				padding: 5,
+				fill: "black",
+				visible: false,
+				alpha: 0.75
+			});
+
+			tooltipLayer.add(tooltip);
+
+			// get areas data
+			var areas = getData();
+
+			// draw areas
+			for (var pubKey in areas) {
+				( function () {
+					var key = pubKey;
+					var area = areas[key];
+					var points = area.points;
+
+					var shape = new Kinetic.Polygon({
+						points: points,
+						fill: area.color,
+						alpha: 0
+					});
+
+					shape.on("mouseover", function () {
+						this.setAlpha(0.5);
+						shapesLayer.draw();
+					});
+					shape.on("mouseout", function () {
+						this.setAlpha(0);
+						shapesLayer.draw();
+						tooltip.hide();
+						tooltipLayer.draw();
+					});
+					shape.on("mousemove", function () {
+						var mousePos = stage.getMousePosition();
+						var x = mousePos.x + 5;
+						var y = mousePos.y + 10;
+						drawTooltip(tooltip, x, y, key);
+					});
+
+					shapesLayer.add(shape);
+				}());
+			}
+
+			stage.add(shapesLayer);
+			stage.add(tooltipLayer);
+		};
+	</script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
